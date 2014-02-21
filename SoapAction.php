@@ -87,13 +87,13 @@ class SoapAction extends Action
 	 */
 	public function run()
 	{
-		$hostInfo = Yii::app()->getRequest()->getHostInfo();
-		$controller = $this->getController();
+		$hostInfo = \Yii::$app->request->hostInfo;
+		$controller = $this->controller;
 		if (($serviceUrl = $this->serviceUrl) === null) {
-			$serviceUrl = $hostInfo . $controller->createUrl($this->getId(), array($this->serviceVar => 1));
+			$serviceUrl = $hostInfo . \Yii::$app->urlManager->createUrl('service/' . $this->id, array($this->serviceVar => 1));
 		}
 		if (($wsdlUrl = $this->wsdlUrl) === null) {
-			$wsdlUrl = $hostInfo . $controller->createUrl($this->getId());
+			$wsdlUrl = $hostInfo . \Yii::$app->urlManager->createUrl('service/' . $this->id);
 		}
 		if (($provider = $this->provider) === null) {
 			$provider = $controller;
@@ -109,19 +109,19 @@ class SoapAction extends Action
 			$this->_service->$name = $value;
 		}
 
+		$this->_service->soapVersion = '1.2';
+
 		if (isset($_GET[$this->serviceVar])) {
-			$this->_service->run();
+			return $this->_service->run();
 		} else {
 			$this->_service->renderWsdl();
 		}
-
-		Yii::app()->end();
 	}
 
 	/**
 	 * Returns the Web service instance currently being used.
 	 *
-	 * @return CWebService the Web service instance
+	 * @return SoapService the Web service instance
 	 */
 	public function getService()
 	{
@@ -135,7 +135,7 @@ class SoapAction extends Action
 	 * @param mixed $provider the web service provider class name or object
 	 * @param string $wsdlUrl the URL for WSDL.
 	 * @param string $serviceUrl the URL for the Web service.
-	 * @return CWebService the Web service instance
+	 * @return SoapService the Web service instance
 	 */
 	protected function createWebService($provider, $wsdlUrl, $serviceUrl)
 	{

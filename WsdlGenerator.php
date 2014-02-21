@@ -225,7 +225,7 @@ class WsdlGenerator extends Component
 			$this->namespace = 'urn:' . str_replace('\\', '/', $className) . 'wsdl';
 		}
 
-		$reflection = new ReflectionClass($className);
+		$reflection = new \ReflectionClass($className);
 		foreach ($reflection->getMethods() as $method) {
 			if ($method->isPublic()) {
 				$this->processMethod($method);
@@ -242,7 +242,7 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param ReflectionMethod $method method
+	 * @param \ReflectionMethod $method method
 	 */
 	protected function processMethod($method)
 	{
@@ -283,7 +283,8 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param string $type PHP variable type
+	 * @param $type
+	 * @return string
 	 */
 	protected function processType($type)
 	{
@@ -296,9 +297,8 @@ class WsdlGenerator extends Component
 			$this->types[$type . '[]'] = 'tns:' . $type . 'Array';
 			$this->processType($type);
 			return $this->types[$type . '[]'];
-		} else { // process class / complex type
-			$type = Yii::import($type, true);
-			$class = new ReflectionClass($type);
+		} else {
+			$class = new \ReflectionClass($type);
 
 			$comment = $class->getDocComment();
 			$comment = strtr($comment, array("\r\n" => "\n", "\r" => "\n")); // make line endings consistent: win -> unix, mac -> unix
@@ -360,9 +360,8 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * Parse attributes nillable, minOccurs, maxOccurs
-	 *
-	 * @param string $comment Extracted PHPDoc comment
+	 * @param $comment
+	 * @return array
 	 */
 	protected function getWsdlElementAttributes($comment)
 	{
@@ -396,11 +395,11 @@ class WsdlGenerator extends Component
 	/**
 	 * Import custom XML source node into WSDL document under specified target node
 	 *
-	 * @param DOMDocument $dom XML WSDL document being generated
-	 * @param DOMElement $target XML node, to which will be appended $source node
-	 * @param DOMNode $source Source XML node to be imported
+	 * @param \DOMDocument $dom XML WSDL document being generated
+	 * @param \DOMElement $target XML node, to which will be appended $source node
+	 * @param \DOMNode $source Source XML node to be imported
 	 */
-	protected function injectDom(DOMDocument $dom, DOMElement $target, DOMNode $source)
+	protected function injectDom(\DOMDocument $dom, \DOMElement $target, \DOMNode $source)
 	{
 		if ($source->nodeType != XML_ELEMENT_NODE) {
 			return;
@@ -420,8 +419,9 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param string $serviceUrl Web service URL
-	 * @param string $encoding encoding of the WSDL. Defaults to 'UTF-8'.
+	 * @param $serviceUrl
+	 * @param $encoding
+	 * @return \DOMDocument
 	 */
 	protected function buildDOM($serviceUrl, $encoding)
 	{
@@ -434,7 +434,7 @@ class WsdlGenerator extends Component
 	 xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\"
 	 xmlns:soap-enc=\"http://schemas.xmlsoap.org/soap/encoding/\"></definitions>";
 
-		$dom = new DOMDocument();
+		$dom = new \DOMDocument();
 		$dom->formatOutput = true;
 		$dom->loadXml($xml);
 		$this->addTypes($dom);
@@ -448,7 +448,7 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
+	 * @param \DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 */
 	protected function addTypes($dom)
 	{
@@ -487,7 +487,7 @@ class WsdlGenerator extends Component
 			} elseif (is_array($xmlType)) {
 				$complexType->setAttribute('name', $phpType);
 				if ($xmlType['custom_wsdl'] !== false) {
-					$custom_dom = new DOMDocument();
+					$custom_dom = new \DOMDocument();
 					$custom_dom->loadXML('<root xmlns:xsd="http://www.w3.org/2001/XMLSchema">' . $xmlType['custom_wsdl'] . '</root>');
 					foreach ($custom_dom->documentElement->childNodes as $el) {
 						$this->injectDom($dom, $complexType, $el);
@@ -530,7 +530,7 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
+	 * @param \DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 */
 	protected function addMessages($dom)
 	{
@@ -550,7 +550,7 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
+	 * @param \DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 */
 	protected function addPortTypes($dom)
 	{
@@ -563,7 +563,7 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
+	 * @param \DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 * @param string $name method name
 	 * @param string $doc doc
 	 */
@@ -585,7 +585,7 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
+	 * @param \DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 */
 	protected function addBindings($dom)
 	{
@@ -606,7 +606,7 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
+	 * @param \DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 * @param string $name method name
 	 */
 	protected function createOperationElement($dom, $name)
@@ -635,7 +635,7 @@ class WsdlGenerator extends Component
 	}
 
 	/**
-	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
+	 * @param \DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 * @param string $serviceUrl Web service URL
 	 */
 	protected function addService($dom, $serviceUrl)
@@ -671,6 +671,7 @@ class WsdlGenerator extends Component
 	 * <ul>
 	 *
 	 * @param bool $return If true, generated HTML output will be returned rather than directly sent to output buffer
+	 * @return string|void
 	 */
 	public function buildHtmlDocs($return = false)
 	{
@@ -724,6 +725,6 @@ th, td{font-size: 12px;font-family: courier;padding: 3px;}
 		}
 
 		echo $html;
-		Yii::app()->end(); // end the app to avoid conflict with text/xml header
+		die();
 	}
 }

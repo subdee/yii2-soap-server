@@ -84,15 +84,6 @@ class SoapService extends Component
 	 * @see http://www.php.net/manual/en/soapserver.setpersistence.php
 	 */
 	public $persistence;
-	/**
-	 * @var string|array WSDL generator configuration. This property may be useful in purpose of enhancing features
-	 * of the standard {@link CWsdlGenerator} class by extending it. For example, some developers may need support
-	 * of the <code>xsd:xsd:base64Binary</code> elements. Another use case is to change initial values
-	 * at instantiation of the default {@link CWsdlGenerator}. The value of this property will be passed
-	 * to {@link Yii::createComponent} to create the generator object. Default value is 'CWsdlGenerator'.
-	 * @since 1.1.12
-	 */
-	public $generatorConfig = 'CWsdlGenerator';
 
 	private $_method;
 
@@ -140,9 +131,8 @@ class SoapService extends Component
 				return $wsdl;
 			}
 		}
-		$generator = $this->generatorConfig;
-		/* @var WsdlGenerator $generator */
-		$generator = new $generator();
+
+		$generator = new WsdlGenerator();
 		$wsdl = $generator->generateWsdl($providerClass, $this->serviceUrl, $this->encoding);
 		if (isset($key))
 			\Yii::$app->cache->set($key, $wsdl, $this->wsdlCacheDuration);
@@ -167,10 +157,12 @@ class SoapService extends Component
 			} else {
 				$provider = $this->provider;
 			}
-
 			$server->setObject($provider);
+			ob_start();
 			$server->handle();
-
+			$soapXml = ob_get_contents();
+			ob_end_clean();
+			return $soapXml;
 		} catch (Exception $e) {
 			if ($e->getCode() !== self::SOAP_ERROR) // non-PHP error
 			{
@@ -222,43 +214,5 @@ class SoapService extends Component
 			$options['actor'] = $this->actor;
 		$options['encoding'] = $this->encoding;
 		return $options;
-	}
-}
-
-
-/**
- * CSoapObjectWrapper is a wrapper class internally used when SoapServer::setObject() is not defined.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @package system.web.services
- */
-class CSoapObjectWrapper
-{
-	/**
-	 * @var object the service provider
-	 */
-	public $object = null;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param object $object the service provider
-	 */
-	public function __construct($object)
-	{
-		$this->object = $object;
-	}
-
-	/**
-	 * PHP __call magic method.
-	 * This method calls the service provider to execute the actual logic.
-	 *
-	 * @param string $name method name
-	 * @param array $arguments method arguments
-	 * @return mixed method return value
-	 */
-	public function __call($name, $arguments)
-	{
-		return call_user_func_array(array($this->object, $name), $arguments);
 	}
 }

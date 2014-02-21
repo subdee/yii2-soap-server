@@ -11,26 +11,9 @@
 		"source": "https://github.com/subdee/yii2-soap-server"
 	},
 	"minimum-stability": "dev",
-	"repositories": [
-		{
-			"type": "package",
-			"package": {
-				"name": "nusphere/nusoap",
-				"version": "0.9.5",
-				"dist": {
-					"url": "http://downloads.sourceforge.net/project/nusoap/nusoap/0.9.5/nusoap-0.9.5.zip",
-					"type": "zip"
-				},
-				"autoload": {
-					"classmap": ["lib/"]
-				}
-			}
-		}
-	],
 	"require": {
 		"ext-soap": "*",
-		"yiisoft/yii2": "*",
-		"nusphere/nusoap": "0.9.5"
+		"yiisoft/yii2": "*"
 	},
 	"autoload": {
 		"psr-4": {"subdee\\soapserver\\": ""}
