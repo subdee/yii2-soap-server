@@ -1,0 +1,38 @@
+{
+	"name": "subdee/yii2-soap-server",
+	"description": "SOAP server for the Yii 2 framework using nuSoap",
+	"keywords": ["yii", "framework", "soap", "server"],
+	"homepage": "https://github.com/subdee/yii2-soap-server",
+	"type": "project",
+	"license": "BSD-3-Clause",
+	"support": {
+		"issues": "https://github.com/subdee/yii2-soap-server/issues?state=open",
+		"wiki": "https://github.com/subdee/yii2-soap-server/wiki",
+		"source": "https://github.com/subdee/yii2-soap-server"
+	},
+	"minimum-stability": "dev",
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "nusphere/nusoap",
+				"version": "0.9.5",
+				"dist": {
+					"url": "http://downloads.sourceforge.net/project/nusoap/nusoap/0.9.5/nusoap-0.9.5.zip",
+					"type": "zip"
+				},
+				"autoload": {
+					"classmap": ["lib/"]
+				}
+			}
+		}
+	],
+	"require": {
+		"ext-soap": "*",
+		"yiisoft/yii2": "*",
+		"nusphere/nusoap": "0.9.5"
+	},
+	"autoload": {
+		"psr-4": {"subdee\\soapserver\\": ""}
+	}
+}
