@@ -109,8 +109,6 @@ class SoapAction extends Action
 			$this->_service->$name = $value;
 		}
 
-		$this->_service->soapVersion = '1.2';
-
 		if (isset($_GET[$this->serviceVar])) {
 			return $this->_service->run();
 		} else {
