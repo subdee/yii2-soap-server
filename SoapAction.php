@@ -90,7 +90,7 @@ class SoapAction extends Action
 		$hostInfo = \Yii::$app->request->hostInfo;
 		$controller = $this->controller;
 		if (($serviceUrl = $this->serviceUrl) === null) {
-			$serviceUrl = $hostInfo . \Yii::$app->urlManager->createUrl('service/' . $this->id, array($this->serviceVar => 1));
+			$serviceUrl = $hostInfo . \Yii::$app->urlManager->createUrl(['service/' . $this->id, $this->serviceVar => 1]);
 		}
 		if (($wsdlUrl = $this->wsdlUrl) === null) {
 			$wsdlUrl = $hostInfo . \Yii::$app->urlManager->createUrl('service/' . $this->id);
