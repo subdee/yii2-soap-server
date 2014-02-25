@@ -3,7 +3,8 @@ yii2-soap-server
 
 A SOAP server for Yii 2 based on the implementation of Yii 1 framework.
 
-This extension is an adaptation of the SOAP Web Service available in Yii1, to Yii2. It is based on Yii version 1.1.14.
+This extension is an adaptation of the SOAP Web Service available in Yii1, to Yii2. 
+It contains features available up to v1.1.15.
 
 Note: Things might not work as Yii2 progresses but I'll keep it updated as much as I can.
 
