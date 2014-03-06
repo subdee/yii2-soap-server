@@ -103,19 +103,6 @@ class SoapService extends Component
 	}
 
 	/**
-	 * Generates and displays the WSDL as defined by the provider.
-	 *
-	 * @see generateWsdl
-	 */
-	public function renderWsdl()
-	{
-		$wsdl = $this->generateWsdl();
-		header('Content-Type: text/xml;charset=' . $this->encoding);
-		header('Content-Length: ' . (function_exists('mb_strlen') ? mb_strlen($wsdl, '8bit') : strlen($wsdl)));
-		echo $wsdl;
-	}
-
-	/**
 	 * Generates the WSDL as defined by the provider.
 	 * The cached version may be used if the WSDL is found valid in cache.
 	 *

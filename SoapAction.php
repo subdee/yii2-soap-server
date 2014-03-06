@@ -112,7 +112,11 @@ class SoapAction extends Action
 		if (isset($_GET[$this->serviceVar])) {
 			return $this->_service->run();
 		} else {
-			$this->_service->renderWsdl();
+			$wsdl = $this->_service->generateWsdl();
+			header('Content-Type: text/xml;charset=' . $this->encoding);
+			header('Content-Length: ' . (function_exists('mb_strlen') ? mb_strlen($wsdl, '8bit') : strlen($wsdl)));
+			echo $wsdl;
+			return true;
 		}
 	}
 
