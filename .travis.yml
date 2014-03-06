@@ -11,4 +11,5 @@ install:
   - composer install
 
 script:
+  - chmod -R 755 test/_log
   - php vendor/bin/codecept run
