@@ -33,6 +33,7 @@
 namespace subdee\soapserver;
 
 use yii\base\Action;
+use yii\web\Response;
 
 class SoapAction extends Action
 {
@@ -87,13 +88,14 @@ class SoapAction extends Action
 	 */
 	public function run()
 	{
+		\Yii::$app->response->format = Response::FORMAT_RAW;
 		$hostInfo = \Yii::$app->request->hostInfo;
 		$controller = $this->controller;
 		if (($serviceUrl = $this->serviceUrl) === null) {
-			$serviceUrl = $hostInfo . \Yii::$app->urlManager->createUrl(['service/' . $this->id, $this->serviceVar => 1]);
+			$serviceUrl = $hostInfo . \Yii::$app->urlManager->createUrl([$controller->id . '/' . $this->id, $this->serviceVar => 1]);
 		}
 		if (($wsdlUrl = $this->wsdlUrl) === null) {
-			$wsdlUrl = $hostInfo . \Yii::$app->urlManager->createUrl('service/' . $this->id);
+			$wsdlUrl = $hostInfo . \Yii::$app->urlManager->createUrl($controller->id . '/' . $this->id);
 		}
 		if (($provider = $this->provider) === null) {
 			$provider = $controller;
@@ -113,10 +115,9 @@ class SoapAction extends Action
 			return $this->_service->run();
 		} else {
 			$wsdl = $this->_service->generateWsdl();
-			header('Content-Type: text/xml;charset=' . $this->encoding);
+			header('Content-Type: text/xml;charset=' . \Yii::$app->response->charset);
 			header('Content-Length: ' . (function_exists('mb_strlen') ? mb_strlen($wsdl, '8bit') : strlen($wsdl)));
-			echo $wsdl;
-			return true;
+			return $wsdl;
 		}
 	}
 
