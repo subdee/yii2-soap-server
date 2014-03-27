@@ -8,7 +8,7 @@ It contains features available up to v1.1.15.
 
 Note: Things might not work as Yii2 progresses but I'll keep it updated as much as I can.
 
-[![Build Status](https://travis-ci.org/subdee/yii2-soap-server.png)](http://travis-ci.org/yiisoft/yii2)
+[![Build Status](https://travis-ci.org/subdee/yii2-soap-server.png)](https://travis-ci.org/subdee/yii2-soap-server)
 
 ##Requirements
 
