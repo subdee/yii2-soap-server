@@ -70,7 +70,7 @@ class SoapService extends Component
      * A PHP class can also be specified as a path alias.
      * @see http://www.php.net/manual/en/soapserver.soapserver.php
      */
-    public $classMap = array();
+    public $classMap = [];
     /**
      * @var string actor of the SOAP service. Defaults to null, meaning not set.
      */
@@ -85,6 +85,12 @@ class SoapService extends Component
      */
     public $persistence;
 
+    /**
+     * Set options like binding style and body style
+     * @var array
+     */
+    public $wsdlOptions = [];
+
     private $_method;
 
 
@@ -95,11 +101,12 @@ class SoapService extends Component
      * @param string $wsdlUrl the URL for WSDL. This is required by {@link run()}.
      * @param string $serviceUrl the URL for the Web service. This is required by {@link generateWsdl()} and {@link renderWsdl()}.
      */
-    public function __construct($provider, $wsdlUrl, $serviceUrl)
+    public function __construct($provider, $wsdlUrl, $serviceUrl, $wsdlOptions = [])
     {
         $this->provider = $provider;
         $this->wsdlUrl = $wsdlUrl;
         $this->serviceUrl = $serviceUrl;
+        $this->wsdlOptions = $wsdlOptions;
     }
 
     /**
@@ -120,9 +127,13 @@ class SoapService extends Component
         }
 
         $generator = new WsdlGenerator();
+        foreach ($this->wsdlOptions as $key => $value) {
+            $generator->$key = $value;
+        }
         $wsdl = $generator->generateWsdl($providerClass, $this->serviceUrl, $this->encoding);
-        if (isset($key))
+        if (isset($key)) {
             \Yii::$app->cache->set($key, $wsdl, $this->wsdlCacheDuration);
+        }
         return $wsdl;
     }
 
@@ -132,12 +143,14 @@ class SoapService extends Component
     public function run()
     {
         header('Content-Type: text/xml;charset=' . $this->encoding);
-        if (YII_DEBUG)
+        if (YII_DEBUG) {
             ini_set("soap.wsdl_cache_enabled", 0);
+        }
         $server = new \SoapServer($this->wsdlUrl, $this->getOptions());
         try {
-            if ($this->persistence !== null)
+            if ($this->persistence !== null) {
                 $server->setPersistence($this->persistence);
+            }
             if (is_string($this->provider)) {
                 $provider = $this->provider;
                 $provider = new $provider();
@@ -158,8 +171,9 @@ class SoapService extends Component
                 \Yii::error($e->__toString());
             }
             $message = $e->getMessage();
-            if (YII_DEBUG)
+            if (YII_DEBUG) {
                 $message .= ' (' . $e->getFile() . ':' . $e->getLine() . ")\n" . $e->getTraceAsString();
+            }
 
             // We need to end application explicitly because of
             // http://bugs.php.net/bug.php?id=49513
@@ -169,37 +183,41 @@ class SoapService extends Component
     }
 
     /**
-     * @return string the currently requested method name. Empty if no method is being requested.
-     */
-    public function getMethodName()
-    {
-        if ($this->_method === null) {
-            if (isset($HTTP_RAW_POST_DATA))
-                $request = $HTTP_RAW_POST_DATA;
-            else
-                $request = file_get_contents('php://input');
-            if (preg_match('/<.*?:Body[^>]*>\s*<.*?:(\w+)/mi', $request, $matches))
-                $this->_method = $matches[1];
-            else
-                $this->_method = '';
-        }
-        return $this->_method;
-    }
-
-    /**
      * @return array options for creating SoapServer instance
      * @see http://www.php.net/manual/en/soapserver.soapserver.php
      */
     protected function getOptions()
     {
-        $options = array();
-        if ($this->soapVersion === '1.1')
+        $options = [];
+        if ($this->soapVersion === '1.1') {
             $options['soap_version'] = SOAP_1_1;
-        elseif ($this->soapVersion === '1.2')
+        } elseif ($this->soapVersion === '1.2') {
             $options['soap_version'] = SOAP_1_2;
-        if ($this->actor !== null)
+        }
+        if ($this->actor !== null) {
             $options['actor'] = $this->actor;
+        }
         $options['encoding'] = $this->encoding;
         return $options;
+    }
+
+    /**
+     * @return string the currently requested method name. Empty if no method is being requested.
+     */
+    public function getMethodName()
+    {
+        if ($this->_method === null) {
+            if (isset($HTTP_RAW_POST_DATA)) {
+                $request = $HTTP_RAW_POST_DATA;
+            } else {
+                $request = file_get_contents('php://input');
+            }
+            if (preg_match('/<.*?:Body[^>]*>\s*<.*?:(\w+)/mi', $request, $matches)) {
+                $this->_method = $matches[1];
+            } else {
+                $this->_method = '';
+            }
+        }
+        return $this->_method;
     }
 }

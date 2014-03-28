@@ -76,7 +76,8 @@ class SoapAction extends Action
      * The array keys are property names of {@link CWebService} and the array values
      * are the corresponding property initial values.
      */
-    public $serviceOptions = array();
+    public $serviceOptions = [];
+    public $wsdlOptions = [];
 
     private $_service;
 
@@ -134,7 +135,7 @@ class SoapAction extends Action
      */
     protected function createWebService($provider, $wsdlUrl, $serviceUrl)
     {
-        return new SoapService($provider, $wsdlUrl, $serviceUrl);
+        return new SoapService($provider, $wsdlUrl, $serviceUrl, $this->wsdlOptions);
     }
 
     /**

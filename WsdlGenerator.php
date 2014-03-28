@@ -348,7 +348,7 @@ class WsdlGenerator extends Component
             }
             $this->messages[$methodName . 'Out'] = array('return' => $return);
         } else {
-            if (preg_match('/^@return\s+([\w\.]+(\[\s*\])?)\s*?(.*)$/im', $comment, $matches)) {
+            if (preg_match('/^@return\s+([\w\.\\\]+(\[\s*\])?)\s*?(.*)$/im', $comment, $matches)) {
                 $type = preg_replace('/\\\\+/', '\\', $matches[1]);
                 $this->elements[$methodName . 'Response'][$methodName . 'Result'] = array(
                     'type' => $this->processType($type),
@@ -427,7 +427,7 @@ class WsdlGenerator extends Component
             foreach ($class->getProperties() as $property) {
                 $comment = $property->getDocComment();
                 if ($property->isPublic() && strpos($comment, '@soap') !== false) {
-                    if (preg_match('/@var\s+([\w\.]+(\[\s*\])?)\s*?(.*)$/mi', $comment, $matches)) {
+                    if (preg_match('/@var\s+([\w\.\\\]+(\[\s*\])?)\s*?(.*)$/mi', $comment, $matches)) {
                         $attributes = $this->getWsdlElementAttributes($matches[3]);
 
                         if (preg_match('/{(.+)}/', $comment, $attr)) {
@@ -440,8 +440,10 @@ class WsdlGenerator extends Component
                             $example = trim($match[1]);
                         }
 
+                        $varType = preg_replace('/\\\\+/', '\\', $matches[1]);
+
                         $this->types[$type]['properties'][$property->getName()] = array(
-                            $this->processType($matches[1]),
+                            $this->processType($varType),
                             trim($matches[3]),
                             $attributes['nillable'],
                             $attributes['minOccurs'],
@@ -733,7 +735,7 @@ class WsdlGenerator extends Component
         $binding->setAttribute('type', 'tns:' . $this->serviceName . 'PortType');
 
         $soapBinding = $dom->createElement('soap:binding');
-        $soapBinding->setAttribute('style', 'rpc');
+        $soapBinding->setAttribute('style', $this->bindingStyle);
         $soapBinding->setAttribute('transport', 'http://schemas.xmlsoap.org/soap/http');
         $binding->appendChild($soapBinding);
 
