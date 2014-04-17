@@ -389,8 +389,6 @@ class WsdlGenerator extends Component
             $this->processType($type);
             return $this->types[$type . '[]'];
         } else { // process class / complex type
-            $type = new $type();
-            $type = get_class($type);
             $class = new \ReflectionClass($type);
 
             $comment = $class->getDocComment();
