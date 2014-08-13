@@ -92,17 +92,13 @@ class SoapAction extends Action
         \Yii::$app->response->format = Response::FORMAT_RAW;
         $hostInfo = \Yii::$app->request->hostInfo;
         $controller = $this->controller;
-        $path = $controller->id . '/' . $this->id;
-        if ($module = $this->controller->module) {
-            $path = $module->id . '/' . $controller->id . '/' . $this->id;
-        }
         if (($serviceUrl = $this->serviceUrl) === null) {
             $serviceUrl = $hostInfo . \Yii::$app->urlManager->createUrl(
-                    [$path, $this->serviceVar => 1]
+                    [$controller->uniqueId . '/' . $this->id, $this->serviceVar => 1]
                 );
         }
         if (($wsdlUrl = $this->wsdlUrl) === null) {
-            $wsdlUrl = $hostInfo . \Yii::$app->urlManager->createUrl($path);
+            $wsdlUrl = $hostInfo . \Yii::$app->urlManager->createUrl($controller->uniqueId . '/' . $this->id);
         }
         if (($provider = $this->provider) === null) {
             $provider = $controller;
