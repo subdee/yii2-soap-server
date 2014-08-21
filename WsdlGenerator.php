@@ -245,10 +245,14 @@ class WsdlGenerator extends Component
         $this->elements = array();
         $this->messages = array();
         if ($this->serviceName === null) {
-            $this->serviceName = str_replace('\\', '/', $className);
+            $pathInfo = pathinfo(str_replace('\\', '/', $className));
+
+            $this->serviceName = $pathInfo['basename'];
         }
         if ($this->namespace === null) {
-            $this->namespace = 'urn:' . str_replace('\\', '/', $className) . 'wsdl';
+            $pathInfo = pathinfo(str_replace('\\', '/', $className));
+
+            $this->namespace = 'urn:' . $pathInfo['basename'] . 'wsdl';
         }
 
         $reflection = new \ReflectionClass($className);
