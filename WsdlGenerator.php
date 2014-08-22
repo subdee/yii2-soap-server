@@ -455,7 +455,10 @@ class WsdlGenerator extends Component
                     }
                 }
             }
-            return 'tns:' . $type;
+
+            $pathInfo = pathinfo(str_replace('\\', '/', $type));
+
+            return 'tns:' . $pathInfo['basename'];
         }
     }
 
