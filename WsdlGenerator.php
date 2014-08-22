@@ -542,11 +542,13 @@ class WsdlGenerator extends Component
             $complexType = $dom->createElement('xsd:complexType');
             if (is_string($xmlType)) {
                 if (($pos = strpos($xmlType, 'tns:')) !== false) {
+                    $pathInfo = pathinfo(str_replace('\\', '/', substr($xmlType, 4)));
+
+                    $complexType->setAttribute('name', $pathInfo['basename']);
+                } else {
                     $pathInfo = pathinfo(str_replace('\\', '/', $xmlType));
 
-                    $complexType->setAttribute('name', substr($pathInfo['basename'], 4));
-                } else {
-                    $complexType->setAttribute('name', $xmlType);
+                    $complexType->setAttribute('name', $pathInfo['basename']);
                 }
 
                 $arrayType = ($dppos = strpos($xmlType, ':')) !== false ? substr(
