@@ -542,13 +542,9 @@ class WsdlGenerator extends Component
             $complexType = $dom->createElement('xsd:complexType');
             if (is_string($xmlType)) {
                 if (($pos = strpos($xmlType, 'tns:')) !== false) {
-                    $pathInfo = pathinfo(str_replace('\\', '/', substr($xmlType, 4)));
-
-                    $complexType->setAttribute('name', $pathInfo['basename']);
+                    $complexType->setAttribute('name', substr($xmlType, 4));
                 } else {
-                    $pathInfo = pathinfo(str_replace('\\', '/', $xmlType));
-
-                    $complexType->setAttribute('name', $pathInfo['basename']);
+                    $complexType->setAttribute('name', $xmlType);
                 }
 
                 $arrayType = ($dppos = strpos($xmlType, ':')) !== false ? substr(
@@ -581,7 +577,9 @@ class WsdlGenerator extends Component
                     $complexType->appendChild($sequence);
                 }
             } elseif (is_array($xmlType)) {
-                $complexType->setAttribute('name', $phpType);
+                $pathInfo = pathinfo(str_replace('\\', '/', $phpType));
+
+                $complexType->setAttribute('name', $pathInfo['basename']);
                 if ($xmlType['custom_wsdl'] !== false) {
                     $custom_dom = new \DOMDocument();
                     $custom_dom->loadXML(
