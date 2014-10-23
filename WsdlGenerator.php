@@ -245,10 +245,14 @@ class WsdlGenerator extends Component
         $this->elements = array();
         $this->messages = array();
         if ($this->serviceName === null) {
-            $this->serviceName = str_replace('\\', '/', $className);
+            $pathInfo = pathinfo(str_replace('\\', '/', $className));
+
+            $this->serviceName = $pathInfo['basename'];
         }
         if ($this->namespace === null) {
-            $this->namespace = 'urn:' . str_replace('\\', '/', $className) . 'wsdl';
+            $pathInfo = pathinfo(str_replace('\\', '/', $className));
+
+            $this->namespace = 'urn:' . $pathInfo['basename'] . 'wsdl';
         }
 
         $reflection = new \ReflectionClass($className);
@@ -451,7 +455,10 @@ class WsdlGenerator extends Component
                     }
                 }
             }
-            return 'tns:' . $type;
+
+            $pathInfo = pathinfo(str_replace('\\', '/', $type));
+
+            return 'tns:' . $pathInfo['basename'];
         }
     }
 
@@ -570,7 +577,9 @@ class WsdlGenerator extends Component
                     $complexType->appendChild($sequence);
                 }
             } elseif (is_array($xmlType)) {
-                $complexType->setAttribute('name', $phpType);
+                $pathInfo = pathinfo(str_replace('\\', '/', $phpType));
+
+                $complexType->setAttribute('name', $pathInfo['basename']);
                 if ($xmlType['custom_wsdl'] !== false) {
                     $custom_dom = new \DOMDocument();
                     $custom_dom->loadXML(
