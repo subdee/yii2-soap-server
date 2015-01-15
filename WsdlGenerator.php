@@ -386,6 +386,8 @@ class WsdlGenerator extends Component
         if (isset(self::$typeMap[$type])) {
             return self::$typeMap[$type];
         } elseif (isset($this->types[$type])) {
+            $pathInfo = pathinfo(str_replace('\\', '/', $type));
+            
             return is_array($this->types[$type]) ? 'tns:' . $type : $this->types[$type];
         } elseif (($pos = strpos($type, '[]')) !== false) { // array of types
             $type = substr($type, 0, $pos);
