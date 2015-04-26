@@ -386,10 +386,14 @@ class WsdlGenerator extends Component
         if (isset(self::$typeMap[$type])) {
             return self::$typeMap[$type];
         } elseif (isset($this->types[$type])) {
-            return is_array($this->types[$type]) ? 'tns:' . $type : $this->types[$type];
+            $pathInfo = pathinfo(str_replace('\\', '/', $type));
+
+            return is_array($this->types[$type]) ? 'tns:' . $pathInfo['basename'] : $this->types[$type];
         } elseif (($pos = strpos($type, '[]')) !== false) { // array of types
             $type = substr($type, 0, $pos);
-            $this->types[$type . '[]'] = 'tns:' . $type . 'Array';
+            $pathInfo = pathinfo(str_replace('\\', '/', $type));
+
+            $this->types[$type . '[]'] = 'tns:' . $pathInfo['basename'] . 'Array';
             $this->processType($type);
             return $this->types[$type . '[]'];
         } else { // process class / complex type
