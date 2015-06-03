@@ -142,15 +142,19 @@ class SoapService extends Component
      */
     public function run()
     {
+        static $auth;
+
         header('Content-Type: text/xml;charset=' . $this->encoding);
         if (YII_DEBUG) {
             ini_set("soap.wsdl_cache_enabled", 0);
         }
 
-//        list(, $hash) = explode(' ', \Yii::$app->getRequest()->getHeaders()->get('authorization') . ' ');
-//        $auth = $hash ? base64_decode($hash) . '@' : '';
-//        $server = new \SoapServer(str_replace('http://', 'http://' . $auth, $this->wsdlUrl), $this->getOptions());
-        $server = new \SoapServer($this->wsdlUrl, $this->getOptions());
+        if (!$auth) {
+            list(, $hash) = explode(' ', \Yii::$app->getRequest()->getHeaders()->get('authorization') . ' ');
+            $auth = $hash ? base64_decode($hash) . '@' : '';
+        }
+
+        $server = new \SoapServer(str_replace('http://', 'http://' . $auth, $this->wsdlUrl), $this->getOptions());
         try {
             if ($this->persistence !== null) {
                 $server->setPersistence($this->persistence);
