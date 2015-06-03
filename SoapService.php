@@ -152,6 +152,10 @@ class SoapService extends Component
         if (!$auth) {
             list(, $hash) = explode(' ', \Yii::$app->getRequest()->getHeaders()->get('authorization') . ' ');
             $auth = $hash ? base64_decode($hash) . '@' : '';
+
+            if(!$auth && $username = \Yii::$app->getRequest()->getAuthUser()) {
+                $auth = \Yii::$app->getRequest()->getAuthPassword() . ':' . $username . '@';
+            }
         }
 
         $server = new \SoapServer(str_replace('http://', 'http://' . $auth, $this->wsdlUrl), $this->getOptions());
