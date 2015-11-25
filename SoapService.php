@@ -127,8 +127,8 @@ class SoapService extends Component
         }
 
         $generator = new WsdlGenerator();
-        foreach ($this->wsdlOptions as $key => $value) {
-            $generator->$key = $value;
+        foreach ($this->wsdlOptions as $option => $value) {
+            $generator->$option = $value;
         }
         $wsdl = $generator->generateWsdl($providerClass, $this->serviceUrl, $this->encoding);
         if (isset($key)) {
