@@ -202,8 +202,7 @@ class SoapService extends Component
         }
         $options['encoding'] = $this->encoding;
 
-        foreach($this->classMap as $type=>$className)
-        {
+        foreach($this->classMap as $type=>$className) {
             $options['classmap'][$type]=$className;
         }
         return $options;
