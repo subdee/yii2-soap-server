@@ -107,7 +107,7 @@
  *     ...
  * }
  * </pre>
- * For more on soap indicators, see See {@link http://www.w3schools.com/schema/schema_complex_indicators.asp}.
+ * For more on soap indicators, see See {@link http://www.w3schools.com/xml/schema_complex_indicators.asp}.
  *
  * Since the variability of WSDL definitions is virtually unlimited, a special doc comment tag '@soap-wsdl' can be used in order to inject any custom XML string into generated WSDL file.
  * If such a block of the code is found in class's comment block, then it will be used instead of parsing and generating standard attributes within the class.
@@ -407,7 +407,7 @@ class WsdlGenerator extends Component
             $comment = preg_replace('/^\s*\**(\s*?$|\s*)/m', '', $comment);
 
             // extract soap indicator flag, if defined, e.g. @soap-indicator sequence
-            // see http://www.w3schools.com/schema/schema_complex_indicators.asp
+            // see http://www.w3schools.com/xml/schema_complex_indicators.asp
             if (preg_match('/^@soap-indicator\s+(\w+)\s*?(.*)$/im', $comment, $matches)) {
                 $indicator = $matches[1];
                 $attributes = $this->getWsdlElementAttributes($matches[2]);
