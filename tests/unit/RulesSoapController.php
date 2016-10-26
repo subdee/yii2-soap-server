@@ -1,5 +1,4 @@
 <?php
-// TODO this could be deleted
 namespace subdee\soapserver\tests\unit;
 
 use subdee\soapserver\tests\models\RulesTestModel;
@@ -11,8 +10,11 @@ class RulesSoapController
     public function actions()
     {
         return [
-            'rulestest' => [
-                'class' => 'subdee\soapserver\SoapAction'
+            'getRules' => [
+                'class' => 'subdee\soapserver\SoapAction',
+                'classMap' => [
+                    'RulesTestModel' => RulesTestModel::class,
+                ],
             ],
         ];
     }
@@ -22,8 +24,8 @@ class RulesSoapController
      * @return \subdee\soapserver\tests\models\RulesTestModel
      * @soap
      */
-    public function getRulestest()
+    public function getRules()
     {
-        return new RulesTestModel();
+        return new \subdee\soapserver\tests\models\RulesTestModel();
     }
 }

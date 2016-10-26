@@ -50,8 +50,8 @@
  * <pre>
  * / **
  *   * A foo method.
- *   * @param string name of something
- *   * @param string value of something
+ *   * @param string $name name of something
+ *   * @param string $value value of something
  *   * @return string[] some array
  *   * @soap
  *   * /
@@ -67,7 +67,7 @@
  *       * /
  *     public $name;
  *     / **
- *       * @var Member[] members of foo
+ *       * @var Member[] $members members of foo
  *       * @soap
  *       * /
  *     public $members;
@@ -234,6 +234,10 @@ class WsdlGenerator extends Component
     protected $messages;
 
     /**
+     * @var array List of validators we know
+     */
+    protected $validators = [];
+    /**
      * Generates the WSDL for the given class.
      *
      * @param string $className class name
@@ -271,6 +275,7 @@ class WsdlGenerator extends Component
             $this->buildHtmlDocs();
         }
 
+        \Codeception\Util\Debug::debug($this->validators);
         return $wsdl;
     }
 
@@ -326,7 +331,7 @@ class WsdlGenerator extends Component
             $type = preg_replace('/\\\\+/', '\\', $matches[1][$i]);
             $type = $this->processType($type);
             $doc = trim($matches[3][$i]);
-            if ($this->bindingStyle == self::STYLE_RPC) {
+            if ($this->bindingStyle === self::STYLE_RPC) {
                 $headers[$name] = array($type, $doc);
             } else {
                 $this->elements[$name][$name] = array('type' => $type);
@@ -381,21 +386,21 @@ class WsdlGenerator extends Component
     }
 
     /**
-     * @param \ReflectionClass $class
-     * @param string $type
+     * @param string $originalClass
      * @return array
      */
-    public function readValidators(\ReflectionClass $class, $type)
+    public function readValidators($originalClass)
     {
         // Maybe we have some validators on this class
         // TODO this should run only one time per class
         // TODO we don't support scenario's
 
+        $class = new \ReflectionClass($originalClass);
         $rulesPerField = [];
         if($class->isSubclassOf('yii\base\Model'))
         {
             $rulesMethod = $class->getMethod('rules');
-            $rules = $rulesMethod->invoke(new $type);
+            $rules = $rulesMethod->invoke(new $originalClass);
 
             foreach($rules as $rule) {
 
@@ -446,6 +451,9 @@ class WsdlGenerator extends Component
         } else { // process class / complex type
             $class = new \ReflectionClass($type);
 
+            // We want to parse the validators we have in order to create restrictions
+            $this->validators[$class->name][] = $this->readValidators($type);
+
             $comment = $class->getDocComment();
             $comment = strtr(
                 $comment,
@@ -476,8 +484,6 @@ class WsdlGenerator extends Component
                 'custom_wsdl' => $custom_wsdl,
                 'properties' => array()
             );
-
-            $validators = $this->readValidators($class, $type);
 
             foreach ($class->getProperties() as $property) {
                 $comment = $property->getDocComment();
@@ -568,7 +574,6 @@ class WsdlGenerator extends Component
         $dom->formatOutput = true;
         $dom->loadXml($xml);
         $this->addTypes($dom);
-        \Codeception\Util\Debug::debug($this->types);
         $this->addMessages($dom);
         $this->addPortTypes($dom);
         $this->addBindings($dom);
@@ -959,5 +964,23 @@ th, td{font-size: 12px;font-family: courier,serif;padding: 3px;}
 
         echo $html;
         die();
+    }
+
+    // // $matches[2] contains name of field, $method->class contains name of class
+
+    /**
+     * @param string $nameOfField
+     * @param $class
+     */
+    private function generateType($nameOfField, $class)
+    {
+//        if(is_null($this->validators))
+        {
+            $this->validators = $this->readValidators($class);
+//            \Codeception\Util\Debug::debug($class);
+        }
+
+//        \Codeception\Util\Debug::debug($this->validators);
+
     }
 }

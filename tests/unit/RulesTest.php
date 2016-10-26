@@ -2,6 +2,8 @@
 namespace subdee\soapserver\tests;
 
 use Codeception\TestCase\Test;
+use subdee\soapserver\SoapService;
+use subdee\soapserver\tests\unit\RulesSoapController;
 use subdee\soapserver\WsdlGenerator;
 
 /**
@@ -10,12 +12,14 @@ use subdee\soapserver\WsdlGenerator;
  */
 class RulesTest extends Test
 {
-    public function testSimple()
+    /**
+     * Test to see if we see all validators (and some get ignored,just like we want)
+     */
+    public function testValidatorsProcessor()
     {
         $wsdlGenerator = new WsdlGenerator();
 
-        $type = 'subdee\soapserver\tests\models\RulesTestModel';
-        $validators = $wsdlGenerator->readValidators(new \ReflectionClass($type), $type);
+        $validators = $wsdlGenerator->readValidators('subdee\soapserver\tests\models\RulesTestModel');
 
         $this->assertArrayHasKey('integerValue',$validators);
         $this->assertArrayHasKey('stringValue', $validators);
@@ -27,5 +31,19 @@ class RulesTest extends Test
         $this->assertEquals('/[a-z]*/i',$validators['regExpValue'][1]['parameters']['pattern']);
 
         $this->assertNotContains('InvalidValidator',$validators['regExpValue']);
+    }
+
+    /**
+     * Test to see how the xml looks
+     */
+    public function testXml()
+    {
+        $controller = new RulesSoapController();
+        $soapService = new SoapService($controller, 'http://wsdl-url/', 'http://test-url/');
+        $wsdl = $soapService->generateWsdl();
+
+        $xml = simplexml_load_string($wsdl);
+
+//        \Codeception\Util\Debug::debug($xml->asXML());
     }
 }
