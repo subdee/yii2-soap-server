@@ -145,6 +145,8 @@
  * </pre>
  * In the example above, WSDL generator would inject under XML node <xsd:User> the code block defined by @soap-wsdl lines.
  *
+ * @header can be used to insert SOAP headers into the request, see https://github.com/yiisoft/yii/pull/2141 for more information
+ *
  * By inserting into SOAP URL link the parameter "?makedoc", WSDL generator will output human-friendly overview of all complex data types rather than XML WSDL file.
  * Each complex type is described in a separate HTML table and recognizes also the '@example' PHPDoc tag. See {@link buildHtmlDocs()}.
  *
