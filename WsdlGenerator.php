@@ -385,10 +385,9 @@ class WsdlGenerator extends Component
      */
     public function readValidators(\ReflectionClass $class, $type)
     {
-        $rules = null;
         // Maybe we have some validators on this class
         // TODO this should run only one time per class
-        // FIXME we don't support scenario's
+        // TODO we don't support scenario's
 
         $rulesPerField = [];
         if($class->isSubclassOf('yii\base\Model'))
@@ -533,9 +532,9 @@ class WsdlGenerator extends Component
                             $nillable = $val ? 'true' : 'false';
                         }
                     } elseif ($prop == 'minoccurs') {
-                        $minOccurs = intval($val);
+                        $minOccurs = (int)$val;
                     } elseif ($prop == 'maxoccurs') {
-                        $maxOccurs = ($val == 'unbounded') ? 'unbounded' : intval($val);
+                        $maxOccurs = ($val == 'unbounded') ? 'unbounded' : (int)$val;
                     }
                 }
             }
@@ -567,7 +566,7 @@ class WsdlGenerator extends Component
         $dom->formatOutput = true;
         $dom->loadXml($xml);
         $this->addTypes($dom);
-
+        \Codeception\Util\Debug::debug($this->types);
         $this->addMessages($dom);
         $this->addPortTypes($dom);
         $this->addBindings($dom);
