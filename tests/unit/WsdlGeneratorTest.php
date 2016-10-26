@@ -8,19 +8,6 @@ use subdee\soapserver\WsdlGenerator;
 
 class WsdlGeneratorTest extends Test
 {
-	/**
-	 * @var \CodeNinja
-	 */
-	protected $codeNinja;
-
-	protected function _before()
-	{
-	}
-
-	protected function _after()
-	{
-	}
-
 	public function testGenerateWsdl()
 	{
 		$wsdlGenerator = new WsdlGenerator();

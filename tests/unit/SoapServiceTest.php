@@ -8,22 +8,6 @@ use subdee\soapserver\SoapService;
 
 class SoapServiceTest extends Test
 {
-   /**
-    * @var \CodeNinja
-    */
-    protected $codeNinja;
-
-	protected $xml = '';
-
-    protected function _before()
-    {
-
-    }
-
-    protected function _after()
-    {
-    }
-
     public function testGenerateWsdl()
     {
 		$controller = new SoapController();
