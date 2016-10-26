@@ -390,7 +390,6 @@ class WsdlGenerator extends Component
         // TODO this should run only one time per class
         // FIXME we don't support scenario's
 
-        // TODO See \yii\validators\Validator for the complete list of standard validators
         $rulesPerField = [];
         if($class->isSubclassOf('yii\base\Model'))
         {
@@ -399,11 +398,12 @@ class WsdlGenerator extends Component
 
             foreach($rules as $rule) {
 
-                if(in_array($rule[1],Validator::$builtInValidators) || in_array($rule[1],array_keys(Validator::$builtInValidators))) {
+                if(array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true)) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
                     }
 
+                    /** @var array $fields */
                     $fields = array_shift($rule);
                     $validator = array_shift($rule);
                     $keys = array_keys($rule);
