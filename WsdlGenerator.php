@@ -156,6 +156,7 @@
 namespace subdee\soapserver;
 
 use yii\base\Component;
+use yii\validators\Validator;
 
 class WsdlGenerator extends Component
 {
@@ -378,6 +379,51 @@ class WsdlGenerator extends Component
     }
 
     /**
+     * @param \ReflectionClass $class
+     * @param string $type
+     * @return array
+     */
+    public function readValidators(\ReflectionClass $class, $type)
+    {
+        $rules = null;
+        // Maybe we have some validators on this class
+        // TODO this should run only one time per class
+        // FIXME we don't support scenario's
+
+        // TODO See \yii\validators\Validator for the complete list of standard validators
+        $rulesPerField = [];
+        if($class->isSubclassOf('yii\base\Model'))
+        {
+            $rulesMethod = $class->getMethod('rules');
+            $rules = $rulesMethod->invoke(new $type);
+
+            foreach($rules as $rule) {
+
+                if(in_array($rule[1],Validator::$builtInValidators) || in_array($rule[1],array_keys(Validator::$builtInValidators))) {
+                    if (!is_array($rule[0])) {
+                        $rule[0] = [$rule[0]];
+                    }
+
+                    $fields = array_shift($rule);
+                    $validator = array_shift($rule);
+                    $keys = array_keys($rule);
+
+                    $parameters = [];
+                    foreach ($keys as $key) {
+                        $parameters[$key] = $rule[$key];
+                    }
+
+                    foreach ($fields as $field) {
+                        $rulesPerField[$field][] = ['validator' => $validator,
+                            'parameters' => $parameters];
+                    }
+                }
+            }
+        }
+        return $rulesPerField;
+
+    }
+    /**
      * @param $type
      * @return string
      */
@@ -430,6 +476,8 @@ class WsdlGenerator extends Component
                 'properties' => array()
             );
 
+            $validators = $this->readValidators($class, $type);
+
             foreach ($class->getProperties() as $property) {
                 $comment = $property->getDocComment();
                 if ($property->isPublic() && strpos($comment, '@soap') !== false) {
@@ -442,7 +490,7 @@ class WsdlGenerator extends Component
 
                         // extract PHPDoc @example
                         $example = '';
-                        if (preg_match("/@example[:]?(.+)/mi", $comment, $match)) {
+                        if (preg_match('/@example[:]?(.+)/mi', $comment, $match)) {
                             $example = trim($match[1]);
                         }
 
