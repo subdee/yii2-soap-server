@@ -298,7 +298,7 @@ class WsdlGenerator extends Component
             $n = count($params);
         }
 
-        if ($this->bindingStyle == self::STYLE_RPC) {
+        if ($this->bindingStyle === self::STYLE_RPC) {
             for ($i = 0; $i < $n; ++$i) {
                 $type = preg_replace('/\\\\+/', '\\', $matches[1][$i]);
                 $message[$params[$i]->getName()] = array(
@@ -527,16 +527,16 @@ class WsdlGenerator extends Component
                 foreach ($attr[2] as $id => $prop) {
                     $prop = strtolower($prop);
                     $val = strtolower($attr[3][$id]);
-                    if ($prop == 'nillable') {
-                        if ($val == 'false' || $val == 'true') {
+                    if ($prop === 'nillable') {
+                        if ($val === 'false' || $val === 'true') {
                             $nillable = $val;
                         } else {
                             $nillable = $val ? 'true' : 'false';
                         }
-                    } elseif ($prop == 'minoccurs') {
+                    } elseif ($prop === 'minoccurs') {
                         $minOccurs = (int)$val;
-                    } elseif ($prop == 'maxoccurs') {
-                        $maxOccurs = ($val == 'unbounded') ? 'unbounded' : (int)$val;
+                    } elseif ($prop === 'maxoccurs') {
+                        $maxOccurs = ($val === 'unbounded') ? 'unbounded' : (int)$val;
                     }
                 }
             }
@@ -611,7 +611,7 @@ class WsdlGenerator extends Component
                     $restriction->setAttribute('base', 'soap-enc:Array');
                     $attribute = $dom->createElement('xsd:attribute');
                     $attribute->setAttribute('ref', 'soap-enc:arrayType');
-                    $attribute->setAttribute('wsdl:arrayType', substr($xmlType, 0, strlen($xmlType) - 5) . '[]');
+                    $attribute->setAttribute('wsdl:arrayType', substr($xmlType, 0, $xmlType - 5) . '[]');
 
                     $restriction->appendChild($attribute);
                     $complexContent->appendChild($restriction);
@@ -910,7 +910,7 @@ class WsdlGenerator extends Component
 table{border-collapse: collapse;background-color: #DDDDDD;}
 tr{background-color: #FFFFFF;}
 th{background-color: #EEEEEE;}
-th, td{font-size: 12px;font-family: courier;padding: 3px;}
+th, td{font-size: 12px;font-family: courier,serif;padding: 3px;}
 </style>';
         $html .= '</head><body>';
         $html .= '<h2>WSDL documentation for service ' . $this->serviceName . '</h2>';
@@ -926,6 +926,7 @@ th, td{font-size: 12px;font-family: courier;padding: 3px;}
                 ) {
                     continue;
                 }
+                /** @var array $params */
                 $params = $options['properties'];
                 $html .= "\n\n<h3>Object: {$object}</h3>";
                 $html .= '<table border="1" cellspacing="1" cellpadding="1">';
