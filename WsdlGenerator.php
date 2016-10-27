@@ -157,7 +157,6 @@
 
 namespace subdee\soapserver;
 
-use Codeception\Util\Debug;
 use yii\base\Component;
 use yii\validators\Validator;
 
@@ -519,62 +518,39 @@ class WsdlGenerator extends Component
                             // TODO add validator output here?
                         ); // name => type, doc, nillable, minOccurs, maxOccurs, example
 
-//                        \Codeception\Util\Debug::debug($this->validators);
-//
                         if(array_key_exists($property->getName(),$this->validators[$property->class])) {
                             foreach($this->validators[$property->class][$property->getName()] as $validator) {
                                 $simpleType = [];
                                 switch($validator['validator']) {
                                     case 'integer':
-                                        $simpleType['restriction']['name'] = 'integer';
-
-                                        if (array_key_exists('min',$validator['parameters'])) {
-                                            $simpleType['restriction']['minInclusive'] = $validator['parameters']['min'];
-                                        }
-                                        if (array_key_exists('max',$validator['parameters'])) {
-                                            $simpleType['restriction']['maxInclusive'] = $validator['parameters']['max'];
-                                        }
-
+                                        $integer = new Validators\IntegerType($validator);
+                                        $simpleType = $integer->generateSimpleType();
                                         break;
                                     case 'trim':
                                         // nothing to do for this type
                                         break;
                                     case 'string':
-                                        $simpleType['restriction']['name'] = 'string';
-
-                                        if(array_key_exists('parameters',$validator) && is_array($validator['parameters'])) {
-                                            $simpleType['restriction']['pattern']  = '{' . implode(',',$validator['parameters']['length']) . '}';
-                                        }
-
+                                        $string = new Validators\StringType($validator);
+                                        $simpleType = $string->generateSimpleType();
                                         break;
                                     case 'in':
-                                        // FIXME we don't support not, strict and allowArray
-                                        $simpleType['restriction']['name'] = 'token';
-                                        if(array_key_exists('range',$validator['parameters'])){
-                                            foreach($validator['parameters']['range'] as $enumeration)
-                                            {
-                                                $simpleType['restriction']['enumeration'][] = $enumeration;
-                                            }
-                                        }
+                                        $token = new Validators\TokenType($validator);
+                                        $simpleType = $token->generateSimpleType();
                                         break;
                                     case 'match':
-                                        $simpleType['restriction']['name'] = 'string';
-                                        if(array_key_exists('pattern',$validator['parameters']))
-                                        {
-                                            preg_match('/^\/(.*)\/.*/',$validator['parameters']['pattern'], $matches);
-                                            $simpleType['restriction']['pattern'] = $matches[1];
-                                        }
+                                        $match = new Validators\MatchType($validator);
+                                        $simpleType = $match->generateSimpleType();
                                         break;
                                     default:
                                         throw new \UnexpectedValueException ('No support for this validation type');
                                     }
 
                                 }
-                                $simpleType['name'] = $property->class . $property->getName(); // TODO name of namespace had to be changed (no / more uppercase?)
+                                $simpleType['name'] = strtolower(str_replace('\\','',$property->getDeclaringClass()->getShortName())) . ucfirst($property->getName());
 
                                 $this->simpleTypes[] = $simpleType;
                             }
-//                        \Codeception\Util\Debug::debug($this->simpleTypes);
+                       // \Codeception\Util\Debug::debug($this->simpleTypes);
 
                     }
                 }
@@ -637,7 +613,7 @@ class WsdlGenerator extends Component
 
         $dom = new \DOMDocument();
         $dom->formatOutput = true;
-        $dom->loadXml($xml);
+        $dom->loadXML($xml);
         $this->addTypes($dom);
         $this->addSimpleTypes($dom);
         $this->addMessages($dom);
@@ -979,6 +955,15 @@ class WsdlGenerator extends Component
                             $enumeration->setAttribute('value', $enum);
                             $restriction->appendChild($enumeration);
                         }
+                    } else if(array_key_exists('minInclusive', $simpleType['restriction'])) {
+                        $minInclusive = $dom->createElement('xsd:minInclusive');
+                        $minInclusive->setAttribute('value', $simpleType['restriction']['minInclusive']);
+                        $restriction->appendChild($minInclusive);
+                    }
+                    else if(array_key_exists('maxInclusive', $simpleType['restriction'])) {
+                        $maxInclusive = $dom->createElement('xsd:maxInclusive');
+                        $maxInclusive->setAttribute('value', $simpleType['restriction']['maxInclusive']);
+                        $restriction->appendChild($maxInclusive);
                     }
 
                     $simpleTypeElement->appendChild($restriction);
