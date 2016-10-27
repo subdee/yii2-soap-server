@@ -34,9 +34,9 @@ class RulesTest extends Test
     }
 
     /**
-     * Test to see how the xml looks
+     * Test to see how the xml looks when we use some simpleTypes
      */
-    public function testXml()
+    public function testGeneratedXmlForSimpleTypes()
     {
         $controller = new RulesSoapController();
         $soapService = new SoapService($controller, 'http://wsdl-url/', 'http://test-url/');
