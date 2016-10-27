@@ -19,7 +19,7 @@ class RulesTest extends Test
     {
         $wsdlGenerator = new WsdlGenerator();
 
-        $validators = $wsdlGenerator->readValidators('subdee\soapserver\tests\models\RulesTestModel');
+        $validators = $wsdlGenerator->parseYiiValidators('subdee\soapserver\tests\models\RulesTestModel');
 
         $this->assertArrayHasKey('integerValue',$validators);
         $this->assertArrayHasKey('stringValue', $validators);
