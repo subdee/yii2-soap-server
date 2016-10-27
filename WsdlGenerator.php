@@ -245,6 +245,7 @@ class WsdlGenerator extends Component
     protected $simpleTypes;
 
     protected static $validatorTypeList = [
+        'email',
         'in',
         'integer',
         'match',
@@ -529,7 +530,7 @@ class WsdlGenerator extends Component
 
                         if(array_key_exists($property->getName(),$this->validators[$property->class])) {
                             foreach ($this->validators[$property->class][$property->getName()] as $validator) {
-
+                                $simpleType = [];
                                 if (in_array($validator['validator'], self::$validatorTypeList, true)) {
                                     $className = 'subdee\soapserver\Validators\\' . ucfirst($validator['validator']) . 'Type';
                                     /** @var SimpleType $validator */
@@ -545,7 +546,6 @@ class WsdlGenerator extends Component
                                     $this->simpleTypes[] = $simpleType;
                                 }
                             }
-//                            \Codeception\Util\Debug::debug($this->simpleTypes);
                         }
                     }
                 }

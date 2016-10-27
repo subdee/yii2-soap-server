@@ -36,12 +36,19 @@ class RulesTestModel extends Model
      */
     public $dateValue;
 
+    /**
+     * @var string
+     * @soap
+     */
+    public $emailValue;
+
     public function rules()
     {
         return [
             ['integerValue','integer','min' => 1, 'max' => 9999],
             [['stringValue','regExpValue'],'trim'],
             ['stringValue','string','length' => [13,37]],
+            ['emailValue','email', 'allowName' => true],
             ['rangeValue','in','range' => [1,2,3]],
             ['regExpValue', 'match', 'pattern' => '/[a-z]*/i'],
             ['regExpValue', 'InvalidValidator']

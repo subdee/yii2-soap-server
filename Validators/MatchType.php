@@ -41,14 +41,12 @@ class MatchType extends SimpleType
 
         $simpleType = $this->generateSimpleType();
 
-        if (array_key_exists('enumeration', $simpleType['restriction'])) {
-            foreach ($simpleType['restriction']['enumeration'] as $enum) {
-                $enumeration = $dom->createElement('xsd:enumeration');
-                $enumeration->setAttribute('value', $enum);
-                $restriction->appendChild($enumeration);
-            }
+        if (array_key_exists('restriction', $simpleType)) {
 
-            $simpleTypeElement->appendChild($restriction);
+            $pattern = $dom->createElement('xsd:token');
+            $pattern->setAttribute('value',$simpleType['restriction']['pattern']);
+
+            $simpleTypeElement->appendChild($pattern);
         }
         $dom->documentElement->appendChild($simpleTypeElement);
 
