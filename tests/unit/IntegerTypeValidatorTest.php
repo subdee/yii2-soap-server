@@ -3,7 +3,6 @@ namespace subdee\soapserver\tests;
 
 use Codeception\TestCase\Test;
 use subdee\soapserver\Validators\IntegerType;
-use yii\validators\Validator;
 
 class IntegerTypeValidatorTest extends Test
 {
