@@ -1,5 +1,5 @@
 <?php
-namespace subdee\soapserver\tests\unit;
+namespace subdee\soapserver\tests\Controllers;
 
 use subdee\soapserver\tests\models\RulesTestModel;
 

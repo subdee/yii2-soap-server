@@ -1,6 +1,6 @@
 <?php
 
-namespace subdee\soapserver\tests\unit;
+namespace subdee\soapserver\tests\Controllers;
 
 class SoapController
 {
