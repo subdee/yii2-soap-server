@@ -33,7 +33,6 @@ abstract class SimpleType
     public function getName()
     {
         $classname = substr(strtolower(get_called_class()), 0, -4);
-        \Codeception\Util\Debug::debug($classname);
         if ($pos = strrpos($classname, '\\'))
         {
             return substr($classname, $pos + 1);
@@ -46,4 +45,11 @@ abstract class SimpleType
      * @return array
      */
     abstract public function generateSimpleType();
+
+    /**
+     * Generates a domElement and inserts it into the given DomDocument
+     * @param \DOMDocument $dom
+     * @return \DOMDocument $dom
+     */
+    abstract public function generateXsd($dom);
 }
