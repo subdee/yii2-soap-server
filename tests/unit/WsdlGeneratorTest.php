@@ -15,11 +15,11 @@ class WsdlGeneratorTest extends Test
 		$wsdl = $wsdlGenerator->generateWsdl(get_class($controller), 'http://test-url/');
 
 		$xml = simplexml_load_string($wsdl);
-		$this->assertInstanceOf(\SimpleXMLElement::class, $xml);
+        $this->assertTrue($xml instanceOf \SimpleXMLElement);
 		$this->assertSame((string) $xml->getName(), 'definitions');
 
 		$operation = $xml->xpath('//wsdl:operation[@name="getHello"]');
-		$this->assertInstanceOf(\SimpleXMLElement::class, $operation[0]);
+        $this->assertTrue($xml instanceOf \SimpleXMLElement);
 
 		$address = $xml->xpath('//soap:address');
 		$location = (string) $address[0]->attributes()->location;
