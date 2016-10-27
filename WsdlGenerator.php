@@ -535,7 +535,7 @@ class WsdlGenerator extends Component
                                     $className = 'subdee\soapserver\Validators\\' . ucfirst($validator['validator']) . 'Type';
                                     /** @var SimpleType $validator */
                                     $validator = new $className($validator);
-                                    $simpleType = $validator->generateSimpleType();
+                                    $simpleType['class'] = $validator;
                                 } else {
                                     throw new \UnexpectedValueException ('No support for this validation type(' . $validator['validator'] . ')');
                                 }
@@ -934,37 +934,10 @@ class WsdlGenerator extends Component
     {
         if (is_array($this->simpleTypes)) {
             foreach ($this->simpleTypes as $simpleType) {
-                $simpleTypeElement = $dom->createElement('xsd:simpleType');
-                $simpleTypeElement->setAttribute('name', $simpleType['name']);
 
-                $restriction = $dom->createElement('xsd:restriction');
-                $restriction->setAttribute('base', 'xsd:' . $simpleType['restriction']['name']);
-
-                if (array_key_exists('restriction', $simpleType)) {
-                    if (array_key_exists('pattern', $simpleType['restriction'])) {
-                        $pattern = $dom->createElement('pattern');
-                        $pattern->setAttribute('value', $simpleType['restriction']['pattern']);
-                        $restriction->appendChild($pattern);
-                    } else if (array_key_exists('enumeration', $simpleType['restriction'])) {
-                        foreach ($simpleType['restriction']['enumeration'] as $enum) {
-                            $enumeration = $dom->createElement('xsd:enumeration');
-                            $enumeration->setAttribute('value', $enum);
-                            $restriction->appendChild($enumeration);
-                        }
-                    } else if(array_key_exists('minInclusive', $simpleType['restriction'])) {
-                        $minInclusive = $dom->createElement('xsd:minInclusive');
-                        $minInclusive->setAttribute('value', $simpleType['restriction']['minInclusive']);
-                        $restriction->appendChild($minInclusive);
-                    }
-                    if(array_key_exists('maxInclusive', $simpleType['restriction'])) {
-                        $maxInclusive = $dom->createElement('xsd:maxInclusive');
-                        $maxInclusive->setAttribute('value', $simpleType['restriction']['maxInclusive']);
-                        $restriction->appendChild($maxInclusive);
-                    }
-
-                    $simpleTypeElement->appendChild($restriction);
-                }
-                $dom->documentElement->appendChild($simpleTypeElement);
+                /** @var Validators\SimpleType $validator */
+                $validator = $simpleType['class'];
+                $validator->generateXsd($dom,$simpleType['name']);
             }
         }
     }

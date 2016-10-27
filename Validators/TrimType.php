@@ -14,4 +14,15 @@ class TrimType extends SimpleType
     {
         return null;
     }
+
+    /**
+     * Generates a domElement and inserts it into the given DomDocument
+     * @param \DOMDocument $dom
+     * @param string $fieldName Which field are we building an XSD for
+     * @return \DOMDocument $dom
+     */
+    public function generateXsd($dom, $fieldName)
+    {
+        return null;
+    }
 }
