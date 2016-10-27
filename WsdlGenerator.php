@@ -157,6 +157,7 @@
 
 namespace subdee\soapserver;
 
+use Codeception\Util\Debug;
 use yii\base\Component;
 use yii\validators\Validator;
 
@@ -237,6 +238,12 @@ class WsdlGenerator extends Component
      * @var array List of validators we know
      */
     protected $validators = [];
+
+    /**
+     * @var array List of simple types (aka which fields have validators )
+     */
+    protected $simpleTypes;
+
     /**
      * Generates the WSDL for the given class.
      *
@@ -275,7 +282,6 @@ class WsdlGenerator extends Component
             $this->buildHtmlDocs();
         }
 
-        \Codeception\Util\Debug::debug($this->validators);
         return $wsdl;
     }
 
@@ -403,7 +409,6 @@ class WsdlGenerator extends Component
             $rules = $rulesMethod->invoke(new $originalClass);
 
             foreach($rules as $rule) {
-
                 if(array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true)) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
@@ -429,9 +434,11 @@ class WsdlGenerator extends Component
         return $rulesPerField;
 
     }
+
     /**
      * @param $type
      * @return string
+     * @throws \UnexpectedValueException
      */
     protected function processType($type)
     {
@@ -452,7 +459,7 @@ class WsdlGenerator extends Component
             $class = new \ReflectionClass($type);
 
             // We want to parse the validators we have in order to create restrictions
-            $this->validators[$class->name][] = $this->readValidators($type);
+            $this->validators[$class->name] = $this->readValidators($type);
 
             $comment = $class->getDocComment();
             $comment = strtr(
@@ -502,7 +509,6 @@ class WsdlGenerator extends Component
                         }
 
                         $varType = preg_replace('/\\\\+/', '\\', $matches[1]);
-
                         $this->types[$type]['properties'][$property->getName()] = array(
                             $this->processType($varType),
                             trim($matches[3]),
@@ -510,7 +516,66 @@ class WsdlGenerator extends Component
                             $attributes['minOccurs'],
                             $attributes['maxOccurs'],
                             $example
+                            // TODO add validator output here?
                         ); // name => type, doc, nillable, minOccurs, maxOccurs, example
+
+//                        \Codeception\Util\Debug::debug($this->validators);
+//
+                        if(array_key_exists($property->getName(),$this->validators[$property->class])) {
+                            foreach($this->validators[$property->class][$property->getName()] as $validator) {
+                                $simpleType = [];
+                                switch($validator['validator']) {
+                                    case 'integer':
+                                        $simpleType['restriction']['name'] = 'integer';
+
+                                        if (array_key_exists('min',$validator['parameters'])) {
+                                            $simpleType['restriction']['minInclusive'] = $validator['parameters']['min'];
+                                        }
+                                        if (array_key_exists('max',$validator['parameters'])) {
+                                            $simpleType['restriction']['maxInclusive'] = $validator['parameters']['max'];
+                                        }
+
+                                        break;
+                                    case 'trim':
+                                        // nothing to do for this type
+                                        break;
+                                    case 'string':
+                                        $simpleType['restriction']['name'] = 'string';
+
+                                        if(array_key_exists('parameters',$validator) && is_array($validator['parameters'])) {
+                                            $simpleType['restriction']['pattern']  = '{' . implode(',',$validator['parameters']['length']) . '}';
+                                        }
+
+                                        break;
+                                    case 'in':
+                                        // FIXME we don't support not, strict and allowArray
+                                        $simpleType['restriction']['name'] = 'token';
+                                        if(array_key_exists('range',$validator['parameters'])){
+                                            foreach($validator['parameters']['range'] as $enumeration)
+                                            {
+                                                $simpleType['restriction']['enumeration'][] = $enumeration;
+                                            }
+                                        }
+                                        break;
+                                    case 'match':
+                                        $simpleType['restriction']['name'] = 'string';
+                                        if(array_key_exists('pattern',$validator['parameters']))
+                                        {
+                                            preg_match('/^\/(.*)\/.*/',$validator['parameters']['pattern'], $matches);
+                                            $simpleType['restriction']['pattern'] = $matches[1];
+                                        }
+                                        break;
+                                    default:
+                                        throw new \UnexpectedValueException ('No support for this validation type');
+                                    }
+
+                                }
+                                $simpleType['name'] = $property->class . $property->getName(); // TODO name of namespace had to be changed (no / more uppercase?)
+
+                                $this->simpleTypes[] = $simpleType;
+                            }
+//                        \Codeception\Util\Debug::debug($this->simpleTypes);
+
                     }
                 }
             }
@@ -574,6 +639,7 @@ class WsdlGenerator extends Component
         $dom->formatOutput = true;
         $dom->loadXml($xml);
         $this->addTypes($dom);
+        $this->addSimpleTypes($dom);
         $this->addMessages($dom);
         $this->addPortTypes($dom);
         $this->addBindings($dom);
@@ -886,6 +952,40 @@ class WsdlGenerator extends Component
         $port->appendChild($soapAddress);
         $service->appendChild($port);
         $dom->documentElement->appendChild($service);
+    }
+
+    /**
+     * Adds the simple types as found in the validators of the models used
+     * @param \DOMDocument $dom
+     */
+    protected function addSimpleTypes($dom)
+    {
+        if (is_array($this->simpleTypes)) {
+            foreach ($this->simpleTypes as $simpleType) {
+                $simpleTypeElement = $dom->createElement('xsd:simpleType');
+                $simpleTypeElement->setAttribute('name', $simpleType['name']);
+
+                $restriction = $dom->createElement('xsd:restriction');
+                $restriction->setAttribute('base', 'xsd:' . $simpleType['restriction']['name']);
+
+                if (array_key_exists('restriction', $simpleType)) {
+                    if (array_key_exists('pattern', $simpleType['restriction'])) {
+                        $pattern = $dom->createElement('pattern');
+                        $pattern->setAttribute('value', $simpleType['restriction']['pattern']);
+                        $restriction->appendChild($pattern);
+                    } else if (array_key_exists('enumeration', $simpleType['restriction'])) {
+                        foreach ($simpleType['restriction']['enumeration'] as $enum) {
+                            $enumeration = $dom->createElement('xsd:enumeration');
+                            $enumeration->setAttribute('value', $enum);
+                            $restriction->appendChild($enumeration);
+                        }
+                    }
+
+                    $simpleTypeElement->appendChild($restriction);
+                }
+                $dom->documentElement->appendChild($simpleTypeElement);
+            }
+        }
     }
 
     /**
