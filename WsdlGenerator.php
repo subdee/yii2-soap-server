@@ -384,10 +384,9 @@ class WsdlGenerator extends Component
             $this->messages[$methodName . 'Out'] = array('parameters' => array('element' => 'tns:' . $methodName . 'Response'));
         }
 
-        if (preg_match('/^\/\*+\s*([^@]*?)\n@/s', $comment, $matches)) {
+        $doc = '';
+        if (preg_match('/^\/\*+\s*([^@]*?)\n@/', $comment, $matches)) {
             $doc = trim($matches[1]);
-        } else {
-            $doc = '';
         }
         $this->operations[$methodName] = array(
             'doc' => $doc,
