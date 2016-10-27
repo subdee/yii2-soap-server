@@ -244,6 +244,9 @@ class WsdlGenerator extends Component
      */
     protected $simpleTypes;
 
+    /**
+     * @var array List of validatorTypes which are inserted into WSDL by using simpletypes
+     */
     protected static $validatorTypeList = [
         'email',
         'in',
@@ -404,7 +407,7 @@ class WsdlGenerator extends Component
      * @param string $originalClass
      * @return array
      */
-    public function readValidators($originalClass)
+    public function parseYiiValidators($originalClass)
     {
         // Maybe we have some validators on this class
         // TODO this should run only one time per class
@@ -468,7 +471,7 @@ class WsdlGenerator extends Component
             $class = new \ReflectionClass($type);
 
             // We want to parse the validators we have in order to create restrictions
-            $this->validators[$class->name] = $this->readValidators($type);
+            $this->validators[$class->name] = $this->parseYiiValidators($type);
 
             $comment = $class->getDocComment();
             $comment = strtr(
