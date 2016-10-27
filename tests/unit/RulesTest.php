@@ -3,7 +3,7 @@ namespace subdee\soapserver\tests;
 
 use Codeception\TestCase\Test;
 use subdee\soapserver\SoapService;
-use subdee\soapserver\tests\unit\RulesSoapController;
+use subdee\soapserver\tests\Controllers\RulesSoapController;
 use subdee\soapserver\WsdlGenerator;
 
 /**

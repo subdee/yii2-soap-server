@@ -3,7 +3,7 @@
 namespace subdee\soapserver\tests;
 
 use Codeception\TestCase\Test;
-use subdee\soapserver\tests\unit\SoapController;
+use subdee\soapserver\tests\Controllers\SoapController;
 use subdee\soapserver\SoapService;
 
 class SoapServiceTest extends Test
