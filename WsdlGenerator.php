@@ -157,6 +157,7 @@
 
 namespace subdee\soapserver;
 
+use subdee\soapserver\Validators\SimpleType;
 use yii\base\Component;
 use yii\validators\Validator;
 
@@ -242,6 +243,15 @@ class WsdlGenerator extends Component
      * @var array List of simple types (aka which fields have validators )
      */
     protected $simpleTypes;
+
+    protected static $validatorTypeList = [
+        'in',
+        'integer',
+        'match',
+        'string',
+        'token',
+        'trim',
+    ];
 
     /**
      * Generates the WSDL for the given class.
@@ -519,39 +529,25 @@ class WsdlGenerator extends Component
                         ); // name => type, doc, nillable, minOccurs, maxOccurs, example
 
                         if(array_key_exists($property->getName(),$this->validators[$property->class])) {
-                            foreach($this->validators[$property->class][$property->getName()] as $validator) {
-                                $simpleType = [];
-                                switch($validator['validator']) {
-                                    case 'integer':
-                                        $integer = new Validators\IntegerType($validator);
-                                        $simpleType = $integer->generateSimpleType();
-                                        break;
-                                    case 'trim':
-                                        // nothing to do for this type
-                                        break;
-                                    case 'string':
-                                        $string = new Validators\StringType($validator);
-                                        $simpleType = $string->generateSimpleType();
-                                        break;
-                                    case 'in':
-                                        $token = new Validators\TokenType($validator);
-                                        $simpleType = $token->generateSimpleType();
-                                        break;
-                                    case 'match':
-                                        $match = new Validators\MatchType($validator);
-                                        $simpleType = $match->generateSimpleType();
-                                        break;
-                                    default:
-                                        throw new \UnexpectedValueException ('No support for this validation type');
-                                    }
+                            foreach ($this->validators[$property->class][$property->getName()] as $validator) {
 
+                                if (in_array($validator['validator'], self::$validatorTypeList, true)) {
+                                    $className = 'subdee\soapserver\Validators\\' . ucfirst($validator['validator']) . 'Type';
+                                    /** @var SimpleType $validator */
+                                    $validator = new $className($validator);
+                                    $simpleType = $validator->generateSimpleType();
+                                } else {
+                                    throw new \UnexpectedValueException ('No support for this validation type(' . $validator['validator'] . ')');
                                 }
-                                $simpleType['name'] = strtolower(str_replace('\\','',$property->getDeclaringClass()->getShortName())) . ucfirst($property->getName());
 
-                                $this->simpleTypes[] = $simpleType;
+                                if($simpleType) {
+                                    $simpleType['name'] = strtolower(str_replace('\\', '', $property->getDeclaringClass()->getShortName())) . ucfirst($property->getName());
+
+                                    $this->simpleTypes[] = $simpleType;
+                                }
                             }
-                       // \Codeception\Util\Debug::debug($this->simpleTypes);
-
+//                            \Codeception\Util\Debug::debug($this->simpleTypes);
+                        }
                     }
                 }
             }
@@ -960,7 +956,7 @@ class WsdlGenerator extends Component
                         $minInclusive->setAttribute('value', $simpleType['restriction']['minInclusive']);
                         $restriction->appendChild($minInclusive);
                     }
-                    else if(array_key_exists('maxInclusive', $simpleType['restriction'])) {
+                    if(array_key_exists('maxInclusive', $simpleType['restriction'])) {
                         $maxInclusive = $dom->createElement('xsd:maxInclusive');
                         $maxInclusive->setAttribute('value', $simpleType['restriction']['maxInclusive']);
                         $restriction->appendChild($maxInclusive);
@@ -1049,23 +1045,5 @@ th, td{font-size: 12px;font-family: courier,serif;padding: 3px;}
 
         echo $html;
         die();
-    }
-
-    // // $matches[2] contains name of field, $method->class contains name of class
-
-    /**
-     * @param string $nameOfField
-     * @param $class
-     */
-    private function generateType($nameOfField, $class)
-    {
-//        if(is_null($this->validators))
-        {
-            $this->validators = $this->readValidators($class);
-//            \Codeception\Util\Debug::debug($class);
-        }
-
-//        \Codeception\Util\Debug::debug($this->validators);
-
     }
 }

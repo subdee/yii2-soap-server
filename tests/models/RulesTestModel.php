@@ -39,7 +39,7 @@ class RulesTestModel extends Model
     public function rules()
     {
         return [
-            ['integerValue','integer'],
+            ['integerValue','integer','min' => 1, 'max' => 9999],
             [['stringValue','regExpValue'],'trim'],
             ['stringValue','string','length' => [13,37]],
             ['rangeValue','in','range' => [1,2,3]],

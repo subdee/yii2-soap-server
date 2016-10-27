@@ -44,6 +44,6 @@ class RulesTest extends Test
 
         $xml = simplexml_load_string($wsdl);
 
-//        \Codeception\Util\Debug::debug($xml->asXML());
+        \Codeception\Util\Debug::debug($xml->asXML());
     }
 }
