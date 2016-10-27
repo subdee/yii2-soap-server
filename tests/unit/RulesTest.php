@@ -43,11 +43,11 @@ class RulesTest extends Test
         $wsdl = $soapService->generateWsdl();
 
         $xml = simplexml_load_string($wsdl);
-        $this->assertTrue($xml instanceOf \SimpleXMLElement);
-        $this->assertTrue((string) $xml->getName() === 'definitions');
+        $this->assertInstanceOf(\SimpleXMLElement::class, $xml);
+        $this->assertSame((string) $xml->getName(), 'definitions');
 
         $rulesValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelIntegerValue"]');
-        $this->assertTrue($rulesValue[0] instanceof \SimpleXMLElement);
+        $this->assertInstanceOf(\SimpleXMLElement::class, $rulesValue[0]);
 
         $tokenValue = $xml->xpath('//xsd:simpleType/xsd:token');
         $this->assertEquals('[a-z]*',$tokenValue[0]['value']);
