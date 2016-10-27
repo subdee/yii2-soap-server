@@ -10,7 +10,6 @@ class TokenType extends SimpleType
     public function generateSimpleType()
     {
         // FIXME we don't support not, strict and allowArray
-        $simpleType = [];
 
         $this->data['restriction']['name'] = 'token';
         if(array_key_exists('range',$this->data['parameters'])){
