@@ -449,11 +449,18 @@ class WsdlGenerator extends Component
 
     /**
      * @param $type
+     * @param \ReflectionProperty $variable Indicated which variable we are working for
      * @return string
-     * @throws \UnexpectedValueException
      */
-    protected function processType($type)
+    protected function processType($type, \ReflectionProperty $variable = null)
     {
+        if(null !== $variable) {
+            foreach($this->simpleTypes as $simpleType) {
+                if ($simpleType['name'] === strtolower($variable->getDeclaringClass()->getShortName()) . ucfirst($variable->getName())) {
+                    return 'tns:' . $simpleType['name'];
+                }
+            }
+        }
         if (isset(self::$typeMap[$type])) {
             return self::$typeMap[$type];
         } elseif (isset($this->types[$type])) {
@@ -520,17 +527,7 @@ class WsdlGenerator extends Component
                             $example = trim($match[1]);
                         }
 
-                        $varType = preg_replace('/\\\\+/', '\\', $matches[1]);
-                        $this->types[$type]['properties'][$property->getName()] = array(
-                            $this->processType($varType),
-                            trim($matches[3]),
-                            $attributes['nillable'],
-                            $attributes['minOccurs'],
-                            $attributes['maxOccurs'],
-                            $example
-                            // TODO add validator output here?
-                        ); // name => type, doc, nillable, minOccurs, maxOccurs, example
-
+                        // We try to created simpleTypes if we have validators defined in the YiiModels
                         if(array_key_exists($property->getName(),$this->validators[$property->class])) {
                             foreach ($this->validators[$property->class][$property->getName()] as $validator) {
                                 $simpleType = [];
@@ -545,11 +542,21 @@ class WsdlGenerator extends Component
 
                                 if($simpleType) {
                                     $simpleType['name'] = strtolower(str_replace('\\', '', $property->getDeclaringClass()->getShortName())) . ucfirst($property->getName());
-
                                     $this->simpleTypes[] = $simpleType;
                                 }
                             }
                         }
+
+                        $varType = preg_replace('/\\\\+/', '\\', $matches[1]);
+                        $this->types[$type]['properties'][$property->getName()] = array(
+                            $this->processType($varType, $property),
+                            trim($matches[3]),
+                            $attributes['nillable'],
+                            $attributes['minOccurs'],
+                            $attributes['maxOccurs'],
+                            $example
+                            // TODO add validator output here?
+                        ); // name => type, doc, nillable, minOccurs, maxOccurs, example
                     }
                 }
             }

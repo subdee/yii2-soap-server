@@ -19,14 +19,6 @@ abstract class SimpleType
     }
 
     /**
-     * @param string $xsdName
-     */
-    public function setXsdName($xsdName)
-    {
-        $this->xsdName = $xsdName;
-    }
-
-    /**
      * returns name of the class without namespacing
      * @return string
      */

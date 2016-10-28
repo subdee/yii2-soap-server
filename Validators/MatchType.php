@@ -34,7 +34,7 @@ class MatchType extends SimpleType
         $simpleTypeElement->setAttribute('name', $fieldName);
 
         $restriction = $dom->createElement('xsd:restriction');
-        $restriction->setAttribute('base', 'xsd:' . $this->getName());
+        $restriction->setAttribute('base', 'xsd:token');
 
         $simpleType = $this->generateSimpleType();
 
@@ -43,8 +43,9 @@ class MatchType extends SimpleType
             $pattern = $dom->createElement('xsd:token');
             $pattern->setAttribute('value',$simpleType['restriction']['pattern']);
 
-            $simpleTypeElement->appendChild($pattern);
+            $restriction->appendChild($pattern);
         }
+        $simpleTypeElement->appendChild($restriction);
         $dom->documentElement->appendChild($simpleTypeElement);
 
         return $dom;

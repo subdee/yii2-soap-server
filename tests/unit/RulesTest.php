@@ -49,7 +49,7 @@ class RulesTest extends Test
         $rulesValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelIntegerValue"]');
         $this->assertTrue($rulesValue[0] instanceof \SimpleXMLElement);
 
-        $tokenValue = $xml->xpath('//xsd:simpleType/xsd:token');
+        $tokenValue = $xml->xpath('//xsd:simpleType/xsd:restriction/xsd:token');
         $this->assertEquals('[a-z]*',$tokenValue[0]['value']);
     }
 }
