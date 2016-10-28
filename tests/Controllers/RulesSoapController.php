@@ -13,7 +13,7 @@ class RulesSoapController
             'getRules' => [
                 'class' => 'subdee\soapserver\SoapAction',
                 'classMap' => [
-                    'RulesTestModel' => RulesTestModel::class,
+                    'RulesTestModel' => '\sudbee\soapserver\tests\models\RulesTestModel',
                 ],
             ],
         ];
