@@ -252,6 +252,7 @@ class WsdlGenerator extends Component
         'email',
         'in',
         'integer',
+        'length',
         'match',
         'number',
         'string',
