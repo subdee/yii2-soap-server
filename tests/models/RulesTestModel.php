@@ -31,7 +31,7 @@ class RulesTestModel extends Model
     public $regExpValue;
 
     /**
-     * @var \DateTime
+     * @var string
      * @soap
      */
     public $dateValue;
@@ -47,6 +47,7 @@ class RulesTestModel extends Model
      * @soap
      */
     public $numberValue;
+
     public function rules()
     {
         return [
@@ -58,6 +59,7 @@ class RulesTestModel extends Model
             ['regExpValue', 'match', 'pattern' => '/[a-z]*/i'],
             ['regExpValue', 'InvalidValidator'],
             ['numberValue','number'],
+            [['dateValue'],'date','format' => 'yyyyMMdd'],
             ];
     }
 }
