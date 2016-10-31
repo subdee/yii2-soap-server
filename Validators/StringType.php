@@ -12,7 +12,14 @@ class StringType extends SimpleType
         $simpleType = [];
 
         if(array_key_exists('parameters',$this->data) && is_array($this->data['parameters'])) {
-            $this->data['restriction']['pattern']  = '{' . implode(',',$this->data['parameters']['length']) . '}';
+            $values = [0,0];
+            if (!is_array($this->data['parameters']['length'])) {
+                $values[1] = $this->data['parameters']['length'];
+            }
+            else {
+                $values = $this->data['parameters']['length'];
+            }
+            $this->data['restriction']['pattern'] = '{' . implode(',', $values) . '}';
         }
 
         $simpleType['restriction']['name'] = $this->getName();

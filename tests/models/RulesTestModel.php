@@ -48,6 +48,12 @@ class RulesTestModel extends Model
      */
     public $numberValue;
 
+    /**
+     * @var string
+     * @soap
+     */
+    public $maxLengthValue;
+
     public function rules()
     {
         return [
@@ -59,7 +65,9 @@ class RulesTestModel extends Model
             ['regExpValue', 'match', 'pattern' => '/[a-z]*/i'],
             ['regExpValue', 'InvalidValidator'],
             ['numberValue','number'],
+            ['regExpValue', 'InvalidValidator'],
             [['dateValue'],'date','format' => 'yyyyMMdd'],
+            ['maxLengthValue', 'string','length' => 1337],
             ];
     }
 }
