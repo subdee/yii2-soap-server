@@ -19,7 +19,7 @@ class StringType extends SimpleType
             else {
                 $values = $this->data['parameters']['length'];
             }
-            $this->data['restriction']['pattern'] = '{' . implode(',', $values) . '}';
+            $simpleType['restriction']['pattern'] = '{' . implode(',', $values) . '}';
         }
 
         $simpleType['restriction']['name'] = $this->getName();
