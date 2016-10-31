@@ -559,7 +559,6 @@ class WsdlGenerator extends Component
                             $attributes['minOccurs'],
                             $attributes['maxOccurs'],
                             $example
-                            // TODO add validator output here?
                         ); // name => type, doc, nillable, minOccurs, maxOccurs, example
                     }
                 }
