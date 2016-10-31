@@ -256,6 +256,7 @@ class WsdlGenerator extends Component
         'token',
         'trim',
         'required',
+        'number',
     ];
 
     /**
