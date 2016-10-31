@@ -11,7 +11,7 @@ class StringType extends SimpleType
     {
         $simpleType = [];
 
-        if(array_key_exists('parameters',$this->data) && is_array($this->data['parameters'])) {
+        if(array_key_exists('parameters',$this->data) && is_array($this->data['parameters']) && array_key_exists('length',$this->data['parameters'])){
             $values = [0,0];
             if (!is_array($this->data['parameters']['length'])) {
                 $values[1] = $this->data['parameters']['length'];
