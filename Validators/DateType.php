@@ -16,6 +16,10 @@ class DateType extends MatchType
         {
             $simpleType['restriction']['pattern'] = strtoupper($this->data['parameters']['format']);
         }
+        else
+        {
+            $simpleType['restriction']['pattern'] = 'YYYYMMDD';
+        }
 
         $simpleType['restriction']['name'] = $this->getName();
 
