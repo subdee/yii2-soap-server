@@ -248,15 +248,16 @@ class WsdlGenerator extends Component
      * @var array List of validatorTypes which are inserted into WSDL by using simpletypes
      */
     protected static $validatorTypeList = [
+        'date',
         'email',
         'in',
         'integer',
         'match',
+        'number',
         'string',
         'token',
         'trim',
         'required',
-        'number',
     ];
 
     /**
@@ -423,6 +424,7 @@ class WsdlGenerator extends Component
             $rules = $rulesMethod->invoke(new $originalClass);
 
             foreach($rules as $rule) {
+                \Codeception\Util\Debug::debug($rule[1]);
                 if(array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true)) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
