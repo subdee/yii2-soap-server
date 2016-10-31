@@ -424,7 +424,6 @@ class WsdlGenerator extends Component
             $rules = $rulesMethod->invoke(new $originalClass);
 
             foreach($rules as $rule) {
-                \Codeception\Util\Debug::debug($rule[1]);
                 if(array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true)) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
