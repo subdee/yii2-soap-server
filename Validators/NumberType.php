@@ -6,5 +6,8 @@ namespace subdee\soapserver\Validators;
  */
 class NumberType extends IntegerType
 {
-
+    public function getName()
+    {
+        return 'integer';
+    }
 }
