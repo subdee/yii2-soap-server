@@ -46,8 +46,7 @@ class MatchType extends SimpleType
             $restriction->appendChild($pattern);
         }
         $simpleTypeElement->appendChild($restriction);
-        $dom->documentElement->appendChild($simpleTypeElement);
 
-        return $dom;
+        return $simpleTypeElement;
     }
 }
