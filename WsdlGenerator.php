@@ -248,7 +248,6 @@ class WsdlGenerator extends Component
      * @var array List of validatorTypes which are inserted into WSDL by using simpletypes
      */
     protected static $validatorTypeList = [
-        'date',
         'email',
         'in',
         'integer',
@@ -540,8 +539,6 @@ class WsdlGenerator extends Component
                                     /** @var SimpleType $validator */
                                     $validator = new $className($validator);
                                     $simpleType['class'] = $validator;
-                                } else {
-                                    throw new \UnexpectedValueException ('No support for this validation type(' . $validator['validator'] . ')');
                                 }
 
                                 if($simpleType) {

@@ -31,7 +31,7 @@ class RulesTestModel extends Model
     public $regExpValue;
 
     /**
-     * @var string
+     * @var date
      * @soap
      */
     public $dateValue;
@@ -66,7 +66,7 @@ class RulesTestModel extends Model
             ['regExpValue', 'InvalidValidator'],
             ['numberValue','number'],
             ['regExpValue', 'InvalidValidator'],
-            [['dateValue'],'date','format' => 'yyyyMMdd'],
+            [['dateValue'],'date'],
             ['maxLengthValue', 'string','length' => 1337],
             ];
     }
