@@ -51,8 +51,6 @@ class StringType extends SimpleType
         }
         $simpleTypeElement->appendChild($restriction);
 
-        $dom->documentElement->appendChild($simpleTypeElement);
-
-        return $dom;
+        return $simpleTypeElement;
     }
 }

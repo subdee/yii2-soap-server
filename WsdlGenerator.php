@@ -611,19 +611,18 @@ class WsdlGenerator extends Component
     protected function buildDOM($serviceUrl, $encoding)
     {
         $xml = "<?xml version=\"1.0\" encoding=\"$encoding\"?>
-<definitions name=\"{$this->serviceName}\" targetNamespace=\"{$this->namespace}\"
+<wsdl:definitions name=\"{$this->serviceName}\" targetNamespace=\"{$this->namespace}\"
 	 xmlns=\"http://schemas.xmlsoap.org/wsdl/\"
 	 xmlns:tns=\"{$this->namespace}\"
 	 xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\"
 	 xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"
 	 xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\"
-	 xmlns:soap-enc=\"http://schemas.xmlsoap.org/soap/encoding/\"></definitions>";
+	 xmlns:soap-enc=\"http://schemas.xmlsoap.org/soap/encoding/\"></wsdl:definitions>";
 
         $dom = new \DOMDocument();
         $dom->formatOutput = true;
         $dom->loadXML($xml);
         $this->addTypes($dom);
-        $this->addSimpleTypes($dom);
         $this->addMessages($dom);
         $this->addPortTypes($dom);
         $this->addBindings($dom);
@@ -747,7 +746,12 @@ class WsdlGenerator extends Component
                 $complexType->appendChild($sequence);
             }
             $element->appendChild($complexType);
+
             $schema->appendChild($element);
+        }
+        foreach($this->addSimpleTypes($dom) as $simpleType)
+        {
+            $schema->appendChild($simpleType);
         }
         $types->appendChild($schema);
         $dom->documentElement->appendChild($types);
@@ -941,17 +945,22 @@ class WsdlGenerator extends Component
     /**
      * Adds the simple types as found in the validators of the models used
      * @param \DOMDocument $dom
+     * @return \DOMElement[]
      */
     protected function addSimpleTypes($dom)
     {
+        $simpleTypes = [];
         if (is_array($this->simpleTypes)) {
             foreach ($this->simpleTypes as $simpleType) {
 
                 /** @var Validators\SimpleType $validator */
                 $validator = $simpleType['class'];
-                $validator->generateXsd($dom,$simpleType['name']);
+                if(is_object($validator->generateXsd($dom,$simpleType['name']))) {
+                    $simpleTypes[] = $validator->generateXsd($dom, $simpleType['name']);
+                }
             }
         }
+        return $simpleTypes;
     }
 
     /**
