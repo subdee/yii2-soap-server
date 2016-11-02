@@ -49,6 +49,18 @@ class RulesTestModel extends Model
     public $numberValue;
 
     /**
+     * @var subdee\soapserver\tests\models\UnboundClass[] {minOccurs = 0, maxOccurs = unbounded}
+     * @soap
+     */
+    public $unboundClass = [];
+
+    /**
+     * @var integer[]
+     * @soap
+     */
+    public $integerArray;
+
+    /**
      * @var string
      * @soap
      */
