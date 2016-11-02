@@ -1,6 +1,7 @@
 <?php
 namespace subdee\soapserver\tests;
 
+use Codeception\Codecept;
 use Codeception\TestCase\Test;
 use subdee\soapserver\SoapService;
 use subdee\soapserver\tests\Controllers\RulesSoapController;
@@ -49,7 +50,12 @@ class RulesTest extends Test
         $rulesValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelIntegerValue"]');
         $this->assertTrue($rulesValue[0] instanceof \SimpleXMLElement);
 
+        $patternValue = $xml->xpath('//xsd:simpleType/xsd:restriction/xsd:pattern');
+        $this->assertEquals('.{13,37}', $patternValue[0]['value']);
+
         $tokenValue = $xml->xpath('//xsd:simpleType/xsd:restriction/xsd:token');
         $this->assertEquals('[a-z]*',$tokenValue[0]['value']);
+
+        \Codeception\Util\Debug::debug($xml->asXML());
     }
 }
