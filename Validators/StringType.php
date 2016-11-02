@@ -19,7 +19,7 @@ class StringType extends SimpleType
             else {
                 $values = $this->data['parameters']['length'];
             }
-            $simpleType['restriction']['pattern'] = '{' . implode(',', $values) . '}';
+            $simpleType['restriction']['pattern'] = '.{' . implode(',', $values) . '}';
         }
 
         $simpleType['restriction']['name'] = $this->getName();
@@ -44,7 +44,7 @@ class StringType extends SimpleType
 
         if (array_key_exists('restriction', $simpleType)) {
             if (array_key_exists('pattern', $simpleType['restriction'])) {
-                $pattern = $dom->createElement('pattern');
+                $pattern = $dom->createElement('xsd:pattern');
                 $pattern->setAttribute('value', $simpleType['restriction']['pattern']);
                 $restriction->appendChild($pattern);
             }
