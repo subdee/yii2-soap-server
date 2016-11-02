@@ -55,7 +55,5 @@ class RulesTest extends Test
 
         $tokenValue = $xml->xpath('//xsd:simpleType/xsd:restriction/xsd:token');
         $this->assertEquals('[a-z]*',$tokenValue[0]['value']);
-
-        \Codeception\Util\Debug::debug($xml->asXML());
     }
 }

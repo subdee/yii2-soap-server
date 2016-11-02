@@ -179,7 +179,6 @@ class WsdlGenerator extends Component
         'date' => 'xsd:date',
         'time' => 'xsd:time',
         'datetime' => 'xsd:dateTime',
-        'array' => 'soap-enc:Array',
         'object' => 'xsd:struct',
         'mixed' => 'xsd:anyType',
     );
@@ -457,6 +456,7 @@ class WsdlGenerator extends Component
      */
     protected function processType($type, \ReflectionProperty $variable = null)
     {
+        // SimpleTypes
         if(null !== $variable) {
             foreach($this->simpleTypes as $simpleType) {
                 if ($simpleType['name'] === strtolower($variable->getDeclaringClass()->getShortName()) . ucfirst($variable->getName())) {
@@ -464,20 +464,25 @@ class WsdlGenerator extends Component
                 }
             }
         }
+        // build-in types (eg. int, string )
         if (isset(self::$typeMap[$type])) {
             return self::$typeMap[$type];
         } elseif (isset($this->types[$type])) {
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
             return is_array($this->types[$type]) ? 'tns:' . $pathInfo['basename'] : $this->types[$type];
-        } elseif (($pos = strpos($type, '[]')) !== false) { // array of types
+        } elseif (isset(self::$typeMap[substr($type,0,-2)]) && ($pos = strpos($type, '[]'))  ) { // array of build-in types
             $type = substr($type, 0, $pos);
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
             $this->types[$type . '[]'] = 'tns:' . $pathInfo['basename'] . 'Array';
             $this->processType($type);
             return $this->types[$type . '[]'];
-        } else { // process class / complex type
+        } else { // process class / complex type / arrays
+
+            if($pos = strpos($type,'[]')) {
+                $type = substr($type, 0, $pos);
+            }
             $class = new \ReflectionClass($type);
 
             // We want to parse the validators we have in order to create restrictions
