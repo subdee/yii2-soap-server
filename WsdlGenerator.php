@@ -501,7 +501,7 @@ class WsdlGenerator extends Component
                 $indicator = $matches[1];
                 $attributes = $this->getWsdlElementAttributes($matches[2]);
             } else {
-                $indicator = 'all';
+                $indicator = 'sequence';
                 $attributes = $this->getWsdlElementAttributes('');
             }
 
