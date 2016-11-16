@@ -13,10 +13,12 @@ class IntegerType extends SimpleType
         $simpleType = [];
 
         if (array_key_exists('min',$this->data['parameters'])) {
-            $simpleType['restriction']['minInclusive'] = $this->data['parameters']['min'];
+            $minInclusive = gmp_init($this->data['parameters']['min']);
+            $simpleType['restriction']['minInclusive'] = gmp_strval($minInclusive);
         }
         if (array_key_exists('max',$this->data['parameters'])) {
-            $simpleType['restriction']['maxInclusive'] = $this->data['parameters']['max'];
+            $maxInclusive = gmp_init($this->data['parameters']['max']);
+            $simpleType['restriction']['maxInclusive'] = gmp_strval($maxInclusive);
         }
         $simpleType['restriction']['name'] = $this->getName();
         return $simpleType;
