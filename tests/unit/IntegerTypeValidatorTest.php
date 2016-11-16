@@ -26,6 +26,20 @@ class IntegerTypeValidatorTest extends Test
         $this->assertEquals('integer',$this->validator->getName());
     }
 
+
+    public function testVeryLargeNumber()
+    {
+        $data = ['parameters' =>
+            [
+                'min' => 5,
+                'max' => '99999999999999999999'
+            ]
+        ];
+        $this->validator = new IntegerType($data);
+        $simpleTypeData = $this->validator->generateSimpleType();
+        $this->assertEquals('99999999999999999999',$simpleTypeData['restriction']['maxInclusive']);
+    }
+
     public function testGeneratedSimpleTypeData()
     {
         $simpleTypeData = $this->validator->generateSimpleType();
