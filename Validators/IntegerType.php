@@ -12,12 +12,16 @@ class IntegerType extends SimpleType
     {
         $simpleType = [];
 
-        if (array_key_exists('min',$this->data['parameters'])) {
-            $minInclusive = gmp_init($this->data['parameters']['min']);
+        $gmp = false;
+        if (function_exists('gmp_init')) {
+            $gmp = true;
+        }
+        if (array_key_exists('min', $this->data['parameters'])) {
+            $minInclusive = ($gmp ? gmp_init($this->data['parameters']['min']) : $this->data['parameters']['min']);
             $simpleType['restriction']['minInclusive'] = gmp_strval($minInclusive);
         }
-        if (array_key_exists('max',$this->data['parameters'])) {
-            $maxInclusive = gmp_init($this->data['parameters']['max']);
+        if (array_key_exists('max', $this->data['parameters'])) {
+            $maxInclusive = ($gmp ? gmp_init($this->data['parameters']['max']) : $this->data['parameters']['max']);
             $simpleType['restriction']['maxInclusive'] = gmp_strval($maxInclusive);
         }
         $simpleType['restriction']['name'] = $this->getName();
@@ -40,12 +44,12 @@ class IntegerType extends SimpleType
 
         $simpleType = $this->generateSimpleType();
 
-        if(array_key_exists('minInclusive', $simpleType['restriction'])) {
+        if (array_key_exists('minInclusive', $simpleType['restriction'])) {
             $minInclusive = $dom->createElement('xsd:minInclusive');
             $minInclusive->setAttribute('value', $simpleType['restriction']['minInclusive']);
             $restriction->appendChild($minInclusive);
         }
-        if(array_key_exists('maxInclusive', $simpleType['restriction'])) {
+        if (array_key_exists('maxInclusive', $simpleType['restriction'])) {
             $maxInclusive = $dom->createElement('xsd:maxInclusive');
             $maxInclusive->setAttribute('value', $simpleType['restriction']['maxInclusive']);
             $restriction->appendChild($maxInclusive);
