@@ -241,7 +241,7 @@ class WsdlGenerator extends Component
     /**
      * @var array List of simple types (aka which fields have validators )
      */
-    protected $simpleTypes;
+    protected $simpleTypes = [];
 
     /**
      * @var array List of validatorTypes which are inserted into WSDL by using simpletypes

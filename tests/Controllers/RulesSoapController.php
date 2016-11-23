@@ -1,8 +1,6 @@
 <?php
 namespace subdee\soapserver\tests\Controllers;
 
-use subdee\soapserver\tests\models\RulesTestModel;
-
 class RulesSoapController
 {
     public $enableCsrfValidation = false;
