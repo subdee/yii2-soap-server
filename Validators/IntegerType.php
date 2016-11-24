@@ -1,6 +1,9 @@
 <?php
 namespace subdee\soapserver\Validators;
 
+/**
+ * @description SimpleType implementation for Integers
+ */
 class IntegerType extends SimpleType
 {
 
@@ -18,11 +21,11 @@ class IntegerType extends SimpleType
         }
         if (array_key_exists('min', $this->data['parameters'])) {
             $minInclusive = ($gmp ? gmp_init($this->data['parameters']['min']) : $this->data['parameters']['min']);
-            $simpleType['restriction']['minInclusive'] = gmp_strval($minInclusive);
+            $simpleType['restriction']['minInclusive'] = ($gmp ? gmp_strval($minInclusive) : $minInclusive);
         }
         if (array_key_exists('max', $this->data['parameters'])) {
             $maxInclusive = ($gmp ? gmp_init($this->data['parameters']['max']) : $this->data['parameters']['max']);
-            $simpleType['restriction']['maxInclusive'] = gmp_strval($maxInclusive);
+            $simpleType['restriction']['maxInclusive'] = ($gmp ? gmp_strval($maxInclusive) : $maxInclusive);
         }
         $simpleType['restriction']['name'] = $this->getName();
         return $simpleType;
@@ -34,7 +37,7 @@ class IntegerType extends SimpleType
      * @param string $fieldName
      * @return \DOMDocument $dom
      */
-    public function generateXsd($dom, $fieldName)
+    public function generateXsd(\DOMDocument $dom, $fieldName)
     {
         $simpleTypeElement = $dom->createElement('xsd:simpleType');
         $simpleTypeElement->setAttribute('name', $fieldName);

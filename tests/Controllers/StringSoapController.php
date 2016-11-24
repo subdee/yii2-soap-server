@@ -1,12 +1,18 @@
 <?php
-declare(strict_types = 1);
-
 namespace subdee\soapserver\tests\Controllers;
 
+/**
+ * @description test for StringArrayModel
+ */
 class StringSoapController
 {
+    /** @var bool */
     public $enableCsrfValidation = false;
 
+    /**
+     * List of all actions which are supported by this soapserver
+     * @return array
+     */
     public function actions()
     {
         return [

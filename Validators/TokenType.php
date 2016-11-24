@@ -1,6 +1,9 @@
 <?php
 namespace subdee\soapserver\Validators;
 
+/**
+ * @description TokenType supports regexp's
+ */
 class TokenType extends SimpleType
 {
     /**

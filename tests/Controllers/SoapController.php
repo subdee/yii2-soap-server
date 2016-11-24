@@ -2,10 +2,17 @@
 
 namespace subdee\soapserver\tests\Controllers;
 
+/**
+ * @description Very simple testcase
+ */
 class SoapController
 {
+    /** @var bool */
 	public $enableCsrfValidation = false;
 
+    /**
+     * @return array
+     */
 	public function actions()
 	{
 		return [

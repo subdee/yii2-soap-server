@@ -1,10 +1,12 @@
 <?php
 
 namespace subdee\soapserver\Validators;
+use yii\base\ErrorException;
 use yii\validators\EmailValidator;
 
 /**
- * Should support the same emailaddresses Yii itself @see http://www.yiiframework.com/doc-2.0/guide-tutorial-core-validators.html#email
+ * Should support the same emailaddresses Yii itself
+ * @see http://www.yiiframework.com/doc-2.0/guide-tutorial-core-validators.html#email
  */
 class EmailType extends MatchType
 {
@@ -23,6 +25,7 @@ class EmailType extends MatchType
         {
             $emailPattern = $emailValidator->fullPattern;
         }
+        // We need to change the regexp which is used by Yii to the format used in the wsdl
         preg_match('/^\/(.*)\/.*/', $emailPattern, $matches);
         $simpleType['restriction']['pattern'] = $matches[1];
 
@@ -31,6 +34,7 @@ class EmailType extends MatchType
         return $simpleType;
     }
 
+    /** @inheritdoc */
     public function getName()
     {
         return 'email';

@@ -162,7 +162,13 @@ class SoapService extends Component
             }
             $server->setObject($provider);
             ob_start();
-            $server->handle();
+            try {
+                $server->handle();
+            }
+            catch(Exception $e)
+            {
+                var_dump($e);die();
+            }
             $soapXml = ob_get_contents();
             ob_end_clean();
             return $soapXml;

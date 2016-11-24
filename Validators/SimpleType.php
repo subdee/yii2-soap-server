@@ -1,12 +1,15 @@
 <?php
 namespace subdee\soapserver\Validators;
 
+/**
+ * @description baseclass for all simpletypes
+ */
 abstract class SimpleType
 {
     /** @var array */
     protected $data;
 
-    /** @var  string */
+    /** @var string */
     protected $xsdName;
 
     /**
@@ -44,5 +47,5 @@ abstract class SimpleType
      * @param string $fieldName Which field are we building an XSD
      * @return \DOMDocument $dom
      */
-    abstract public function generateXsd($dom, $fieldName);
+    abstract public function generateXsd(\DOMDocument $dom, $fieldName);
 }

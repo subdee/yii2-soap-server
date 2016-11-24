@@ -3,17 +3,24 @@ namespace subdee\soapserver\tests\Controllers;
 
 use subdee\soapserver\tests\models\UnboundClass;
 
+/**
+ * @description Testcase for an unbounded array
+ */
 class UnboundedSoapController
 {
+    /** @var bool  */
     public $enableCsrfValidation = false;
 
+    /**
+     * @return array
+     */
     public function actions()
     {
         return [
             'getUnbounded' => [
                 'class' => 'subdee\soapserver\SoapAction',
                 'classMap' => [
-                    'UnboundedClass' => UnboundClass::class,
+                    'UnboundedClass' => '\subdee\soapserver\tests\models\UnboundClass',
                 ],
             ],
         ];
