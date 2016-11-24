@@ -1,6 +1,9 @@
 <?php
 namespace subdee\soapserver\Validators;
 
+/**
+ * @description Stringtype simpletype
+ */
 class StringType extends SimpleType
 {
     /**
@@ -12,6 +15,7 @@ class StringType extends SimpleType
         $simpleType = [];
 
         if(array_key_exists('parameters',$this->data) && is_array($this->data['parameters']) && array_key_exists('length',$this->data['parameters'])){
+            // Most of the time you don't want an empty value, but it has to contain 'something' that's why we start with 1,0 as an default value
             $values = [1,0];
             if (!is_array($this->data['parameters']['length'])) {
                 $values[1] = $this->data['parameters']['length'];
@@ -32,7 +36,7 @@ class StringType extends SimpleType
      * @param string $fieldName Which field are we building an XSD for
      * @return \DOMDocument $dom
      */
-    public function generateXsd($dom, $fieldName)
+    public function generateXsd(\DOMDocument $dom, $fieldName)
     {
         $simpleTypeElement = $dom->createElement('xsd:simpleType');
         $simpleTypeElement->setAttribute('name', $fieldName);

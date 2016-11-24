@@ -1,10 +1,17 @@
 <?php
 namespace subdee\soapserver\tests\Controllers;
 
+/**
+ * @description Test for RulesTestModel
+ */
 class RulesSoapController
 {
+    /** @var bool  */
     public $enableCsrfValidation = false;
 
+    /**
+     * @return array
+     */
     public function actions()
     {
         return [

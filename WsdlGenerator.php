@@ -406,6 +406,7 @@ class WsdlGenerator extends Component
     }
 
     /**
+     * Here we parse the validators which are defined in Yii2 Model classes
      * @param string $originalClass
      * @return array
      */
@@ -423,12 +424,13 @@ class WsdlGenerator extends Component
             $rules = $rulesMethod->invoke(new $originalClass);
 
             foreach($rules as $rule) {
+                // If we know the validator (cause it's build-in), we parse the validator. We don't support external validators
                 if(array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true)) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
                     }
 
-                    /** @var array $fields */
+                    /** @var string[] $fields */
                     $fields = array_shift($rule);
                     $validator = array_shift($rule);
                     $keys = array_keys($rule);
@@ -439,8 +441,7 @@ class WsdlGenerator extends Component
                     }
 
                     foreach ($fields as $field) {
-                        $rulesPerField[$field][] = ['validator' => $validator,
-                            'parameters' => $parameters];
+                        $rulesPerField[$field][] = ['validator' => $validator, 'parameters' => $parameters];
                     }
                 }
             }
@@ -450,6 +451,7 @@ class WsdlGenerator extends Component
     }
 
     /**
+     * We process all the types we've found here
      * @param $type
      * @param \ReflectionProperty $variable Indicated which variable we are working for
      * @return string
@@ -949,7 +951,7 @@ class WsdlGenerator extends Component
      * @param \DOMDocument $dom
      * @return \DOMElement[]
      */
-    protected function addSimpleTypes($dom)
+    protected function addSimpleTypes(\DOMDocument $dom)
     {
         $simpleTypes = [];
         if (is_array($this->simpleTypes)) {
