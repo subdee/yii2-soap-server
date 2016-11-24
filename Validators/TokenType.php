@@ -32,7 +32,7 @@ class TokenType extends SimpleType
      * @param string $fieldName Which field are we building an XSD for
      * @return \DOMDocument $dom
      */
-    public function generateXsd($dom, $fieldName)
+    public function generateXsd(\DOMDocument $dom, $fieldName)
     {
         $simpleTypeElement = $dom->createElement('xsd:simpleType');
         $simpleTypeElement->setAttribute('name', $fieldName);
