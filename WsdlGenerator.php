@@ -414,7 +414,6 @@ class WsdlGenerator extends Component
     {
         // Maybe we have some validators on this class
         // TODO this should run only one time per class
-        // TODO we don't support scenario's
 
         $class = new \ReflectionClass($originalClass);
         $rulesPerField = [];
@@ -424,8 +423,9 @@ class WsdlGenerator extends Component
             $rules = $rulesMethod->invoke(new $originalClass);
 
             foreach($rules as $rule) {
-                // If we know the validator (cause it's build-in), we parse the validator. We don't support external validators
-                if(array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true)) {
+                // If we find 'wsdl' in the scenario's and if we know the validator (cause it's build-in), we parse the
+                // validator. We don't support external validators
+                if(in_array('wsdl',$rule['on'], true) && (array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true))) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
                     }
@@ -433,6 +433,7 @@ class WsdlGenerator extends Component
                     /** @var string[] $fields */
                     $fields = array_shift($rule);
                     $validator = array_shift($rule);
+                    array_shift($rule); // we don't need the 'on' parameter which is always the third parameter in this array
                     $keys = array_keys($rule);
 
                     $parameters = [];

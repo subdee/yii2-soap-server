@@ -6,6 +6,9 @@ use Codeception\TestCase\Test;
 use subdee\soapserver\tests\Controllers\SoapController;
 use subdee\soapserver\WsdlGenerator;
 
+/**
+ * @description WSDL Generator Test
+ */
 class WsdlGeneratorTest extends Test
 {
 	public function testGenerateWsdl()
