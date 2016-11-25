@@ -26,6 +26,7 @@ class RulesTest extends Test
 
         $this->assertArrayHasKey('validator',$validators['integerValue'][0]);
 
+        $this->assertArrayNotHasKey('on',$validators['regExpValue'][0]['parameters']);
         $this->assertEquals('trim',$validators['regExpValue'][0]['validator']);
 
         $this->assertEquals('/[a-z]*/i',$validators['regExpValue'][1]['parameters']['pattern']);
