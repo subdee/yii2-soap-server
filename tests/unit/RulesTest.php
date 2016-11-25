@@ -1,14 +1,13 @@
 <?php
 namespace subdee\soapserver\tests;
 
-use Codeception\Codecept;
 use Codeception\TestCase\Test;
 use subdee\soapserver\SoapService;
 use subdee\soapserver\tests\Controllers\RulesSoapController;
 use subdee\soapserver\WsdlGenerator;
 
 /**
- * Class RulesTest
+ * @description RulesTest
  * @package subdee\soapserver\tests
  */
 class RulesTest extends Test
