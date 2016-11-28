@@ -425,7 +425,7 @@ class WsdlGenerator extends Component
             foreach($rules as $rule) {
                 // If we find 'wsdl' in the scenario's and if we know the validator (cause it's build-in), we parse the
                 // validator. We don't support external validators
-                if(in_array('wsdl',$rule['on'], true) && (array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true))) {
+                if($rule['on'] === 'wsdl' && (array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true))) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
                     }
