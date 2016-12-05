@@ -1,10 +1,12 @@
 <?php
-declare(strict_types = 1);
-
 namespace subdee\soapserver\tests\models;
 
 use yii\base\Model;
 
+/**
+ * @description Model needed for tests
+ * @package subdee\soapserver\tests\models
+ */
 class StringArrayModel extends Model
 {
     /**
