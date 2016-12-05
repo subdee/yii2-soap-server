@@ -12,9 +12,10 @@
 	},
 	"minimum-stability": "dev",
 	"require": {
+		"roave/security-advisories": "dev-master",
 		"ext-soap": "*",
 		"yiisoft/yii2": "*",
-		"codeception/codeception": "*"
+		"codeception/codeception": "2.2.*"
 	},
 	"autoload": {
 		"psr-4": {"subdee\\soapserver\\": ""}
