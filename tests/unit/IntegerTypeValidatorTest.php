@@ -6,6 +6,10 @@ use subdee\soapserver\Validators\IntegerType;
 use yii\validators\NumberValidator;
 use yii\i18n\Formatter;
 
+/**
+ * @description Test for IntegerTypeValidator
+ * @package subdee\soapserver\tests
+ */
 class IntegerTypeValidatorTest extends Test
 {
     /** @var \subdee\soapserver\Validators\SimpleType */

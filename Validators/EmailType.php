@@ -1,7 +1,6 @@
 <?php
-
 namespace subdee\soapserver\Validators;
-use yii\base\ErrorException;
+
 use yii\validators\EmailValidator;
 
 /**

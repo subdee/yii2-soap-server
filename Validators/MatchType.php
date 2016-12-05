@@ -1,7 +1,6 @@
 <?php
 namespace subdee\soapserver\Validators;
 
-
 /**
  * @description regexp support
  */

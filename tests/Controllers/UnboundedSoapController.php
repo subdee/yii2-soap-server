@@ -1,8 +1,6 @@
 <?php
 namespace subdee\soapserver\tests\Controllers;
 
-use subdee\soapserver\tests\models\UnboundClass;
-
 /**
  * @description Testcase for an unbounded array
  */
