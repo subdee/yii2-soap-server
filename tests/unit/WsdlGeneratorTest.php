@@ -1,5 +1,4 @@
 <?php
-
 namespace subdee\soapserver\tests;
 
 use Codeception\TestCase\Test;

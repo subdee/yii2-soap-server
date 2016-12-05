@@ -7,11 +7,16 @@ define('YII_DEBUG',true);
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../vendor/yiisoft/yii2/Yii.php';
 
+/**
+ * Auoloaded for classes
+ * @param string $class_name
+ */
 function autoload_class_dir($class_name)
 {
     $fileName = 'Classes/' . $class_name . '.php';
     if(file_exists($fileName))
     {
+        /** @noinspection PhpIncludeInspection */
         require_once $fileName;
     }
 }

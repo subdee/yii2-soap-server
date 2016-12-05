@@ -1,7 +1,10 @@
 <?php
 namespace subdee\soapserver\tests\models;
 
-
+/**
+ * @description Unbounded test model
+ * @package subdee\soapserver\tests\models
+ */
 class UnboundedTestModel
 {
     /**
