@@ -3,6 +3,8 @@ namespace subdee\soapserver\tests;
 
 use Codeception\TestCase\Test;
 use subdee\soapserver\Validators\IntegerType;
+use yii\validators\NumberValidator;
+use yii\i18n\Formatter;
 
 class IntegerTypeValidatorTest extends Test
 {
@@ -18,6 +20,17 @@ class IntegerTypeValidatorTest extends Test
             ]
         ];
         $this->validator = new IntegerType($data);
+
+        new \yii\console\Application(\yii\helpers\ArrayHelper::merge([
+            'id' => 'testapp',
+            'basePath' => __DIR__,
+            'timeZone' => 'UTC',
+            'language' => 'en-EN',
+            'vendorPath' => __DIR__ . '/../../vendor/',
+        ], []));
+
+        $this->formatter = new Formatter(['locale' => 'en-US']);
+
         return parent::setUp();
     }
 
@@ -46,5 +59,13 @@ class IntegerTypeValidatorTest extends Test
         $this->assertInstanceOf('subdee\soapserver\Validators\IntegerType',$this->validator);
         $this->assertArrayHasKey('restriction', $simpleTypeData);
         $this->assertArrayHasKey('minInclusive', $simpleTypeData['restriction']);
+    }
+
+    public function testVeryLargeInteger()
+    {
+        $val = new NumberValidator(['min' => 1, 'max' => '99999999999999999999']);
+        $this->assertTrue($val->validate(30));
+
+        $this->assertTrue($val->validate(100000));
     }
 }
