@@ -1,12 +1,14 @@
 <?php
-declare(strict_types = 1);
-
 namespace subdee\soapserver\tests;
 
 use Codeception\TestCase\Test;
 use subdee\soapserver\tests\Controllers\StringSoapController;
 use subdee\soapserver\WsdlGenerator;
 
+/**
+ * @description Test for string arrays
+ * @package subdee\soapserver\tests
+ */
 class StringArrayTest extends Test
 {
     /**
