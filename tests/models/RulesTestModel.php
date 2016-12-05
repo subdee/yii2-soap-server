@@ -9,6 +9,8 @@ use yii\base\Model;
 class RulesTestModel extends Model
 {
 
+    const SCENARIO_WSDL = 'wsdl';
+
     /**
      * @var integer
      * @soap
@@ -76,17 +78,17 @@ class RulesTestModel extends Model
     public function rules()
     {
         return [
-            ['integerValue', 'integer', 'on' => ['wsdl'], 'min' => 1, 'max' => 9999],
-            [['stringValue', 'regExpValue'], 'trim', 'on' => ['wsdl']],
-            ['stringValue', 'string', 'on' => ['wsdl'], 'length' => [13, 37]],
-            ['emailValue', 'email', 'on' => ['wsdl'], 'allowName' => true],
-            ['rangeValue', 'in', 'on' => ['wsdl'], 'range' => [1, 2, 3]],
-            ['regExpValue', 'match', 'on' => ['wsdl'], 'pattern' => '/[a-z]*/i'],
-            ['regExpValue', 'InvalidValidator', 'on' => ['wsdl']],
-            ['numberValue', 'number', 'on' => ['wsdl']],
-            ['regExpValue', 'InvalidValidator', 'on' => ['wsdl']],
-            [['dateValue'], 'date', 'on' => ['wsdl']],
-            ['maxLengthValue', 'string', 'on' => ['wsdl'], 'length' => 1337],
+            ['integerValue', 'integer', 'on' => self::SCENARIO_WSDL, 'min' => 1, 'max' => 9999],
+            [['stringValue', 'regExpValue'], 'trim', 'on' => self::SCENARIO_WSDL],
+            ['stringValue', 'string', 'on' => self::SCENARIO_WSDL, 'length' => [13, 37]],
+            ['emailValue', 'email', 'on' => self::SCENARIO_WSDL, 'allowName' => true],
+            ['rangeValue', 'in', 'on' => self::SCENARIO_WSDL, 'range' => [1, 2, 3]],
+            ['regExpValue', 'match', 'on' => self::SCENARIO_WSDL, 'pattern' => '/[a-z]*/i'],
+            ['regExpValue', 'InvalidValidator', 'on' => self::SCENARIO_WSDL],
+            ['numberValue', 'number', 'on' => self::SCENARIO_WSDL],
+            ['regExpValue', 'InvalidValidator', 'on' => self::SCENARIO_WSDL],
+            [['dateValue'], 'date', 'on' => self::SCENARIO_WSDL],
+            ['maxLengthValue', 'string', 'on' => self::SCENARIO_WSDL, 'length' => 1337],
         ];
     }
 }
