@@ -2,9 +2,10 @@
 namespace subdee\soapserver\Validators;
 
 /**
- * @description SimpleType implementation for Integers
+ * @description Validator for explicit Doubles
+ * @package subdee\soapserver\Validators
  */
-class IntegerType extends SimpleType
+class DoubleType extends SimpleType
 {
 
     /**
@@ -15,19 +16,22 @@ class IntegerType extends SimpleType
     {
         $simpleType = [];
 
-        $gmp = false;
-        if (function_exists('gmp_init')) {
-            $gmp = true;
-        }
+        $fractionDigits = 0;
+
         if (array_key_exists('min', $this->data['parameters'])) {
-            $minInclusive = ($gmp ? gmp_init($this->data['parameters']['min']) : $this->data['parameters']['min']);
-            $simpleType['restriction']['minInclusive'] = ($gmp ? gmp_strval($minInclusive) : $minInclusive);
+            $minInclusive = $this->data['parameters']['min'];
+            $simpleType['restriction']['minInclusive'] = $minInclusive;
+            $simpleType['restriction']['fractionDigits'] = $this->numberOfDecimals($minInclusive);
         }
         if (array_key_exists('max', $this->data['parameters'])) {
-            $maxInclusive = ($gmp ? gmp_init($this->data['parameters']['max']) : $this->data['parameters']['max']);
-            $simpleType['restriction']['maxInclusive'] = ($gmp ? gmp_strval($maxInclusive) : $maxInclusive);
+            $maxInclusive = $this->data['parameters']['max'];
+            $simpleType['restriction']['maxInclusive'] = $maxInclusive;
+            $simpleType['restriction']['fractionDigits'] = max($fractionDigits, $this->numberOfDecimals($maxInclusive));
         }
+
         $simpleType['restriction']['name'] = $this->getName();
+
+
         return $simpleType;
     }
 
@@ -43,7 +47,7 @@ class IntegerType extends SimpleType
         $simpleTypeElement->setAttribute('name', $fieldName);
 
         $restriction = $dom->createElement('xsd:restriction');
-        $restriction->setAttribute('base', 'xsd:' . $this->getName());
+        $restriction->setAttribute('base', 'xsd:decimal');
 
         $simpleType = $this->generateSimpleType();
 
@@ -51,6 +55,7 @@ class IntegerType extends SimpleType
             $minInclusive = $dom->createElement('xsd:minInclusive');
             $minInclusive->setAttribute('value', $simpleType['restriction']['minInclusive']);
             $restriction->appendChild($minInclusive);
+
         }
         if (array_key_exists('maxInclusive', $simpleType['restriction'])) {
             $maxInclusive = $dom->createElement('xsd:maxInclusive');
@@ -58,8 +63,32 @@ class IntegerType extends SimpleType
             $restriction->appendChild($maxInclusive);
         }
 
+        if (array_key_exists('fractionDigits', $simpleType['restriction'])) {
+            $fraction = $dom->createElement('xsd:fractionDigits');
+            $fraction->setAttribute('value', $simpleType['restriction']['fractionDigits']);
+            $restriction->appendChild($fraction);
+        }
         $simpleTypeElement->appendChild($restriction);
 
         return $simpleTypeElement;
+    }
+
+    /**
+     * Returns the number of decimals of a number
+     * @param $value
+     * @return bool|int
+     */
+    private function numberOfDecimals($value)
+    {
+        if (!is_string($value)) {
+            $value = (string)$value;
+        }
+        if ((int)$value === $value) {
+            return 0;
+        } else if (!is_numeric($value)) {
+            return false;
+        }
+
+        return strlen($value) - strrpos($value, '.') - 1;
     }
 }

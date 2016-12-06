@@ -55,5 +55,16 @@ class RulesTest extends Test
 
         $tokenValue = $xml->xpath('//xsd:simpleType/xsd:restriction/xsd:token');
         $this->assertEquals('[a-z]*',$tokenValue[0]['value']);
+
+        $fractionDigitValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelNumberValue"]/xsd:restriction/xsd:fractionDigits');
+        $this->assertEquals('2', $fractionDigitValue[0]['value']);
+
+        $numbersBehindDecimalValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelNumberValue"]/xsd:restriction/xsd:minInclusive');
+        $this->assertEquals('1.11', $numbersBehindDecimalValue[0]['value']);
+
+        $largeNumbersBehindDecimalValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelLargeNumberValue"]/xsd:restriction/xsd:maxInclusive');
+        $this->assertEquals('99999999999999999999.999', $largeNumbersBehindDecimalValue[0]['value']);
+
+        print_r($xml->asXML());die();
     }
 }

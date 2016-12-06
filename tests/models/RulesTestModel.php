@@ -48,7 +48,7 @@ class RulesTestModel extends Model
     public $emailValue;
 
     /**
-     * @var integer
+     * @var double
      * @soap
      */
     public $numberValue;
@@ -72,20 +72,27 @@ class RulesTestModel extends Model
     public $maxLengthValue;
 
     /**
+     * @var double
+     * @soap
+     */
+    public $largeNumberValue;
+
+    /**
      * List of rules for this class
      * @return array
      */
     public function rules()
     {
         return [
-            ['integerValue', 'integer', 'on' => self::SCENARIO_WSDL, 'min' => 1, 'max' => 9999],
+            ['integerValue', 'integer', 'on' => self::SCENARIO_WSDL, 'min' => 1, 'integerOnly' => true, 'max' => 9999],
             [['stringValue', 'regExpValue'], 'trim', 'on' => self::SCENARIO_WSDL],
             ['stringValue', 'string', 'on' => self::SCENARIO_WSDL, 'length' => [13, 37]],
             ['emailValue', 'email', 'on' => self::SCENARIO_WSDL, 'allowName' => true],
             ['rangeValue', 'in', 'on' => self::SCENARIO_WSDL, 'range' => [1, 2, 3]],
             ['regExpValue', 'match', 'on' => self::SCENARIO_WSDL, 'pattern' => '/[a-z]*/i'],
             ['regExpValue', 'InvalidValidator', 'on' => self::SCENARIO_WSDL],
-            ['numberValue', 'number', 'on' => self::SCENARIO_WSDL],
+            ['numberValue', 'number', 'on' => self::SCENARIO_WSDL, 'integerOnly' => false, 'min' => 1.11, 'max' => 999],
+            ['largeNumberValue', 'number', 'on' => self::SCENARIO_WSDL, 'integerOnly' => false, 'min' => 1.11, 'max' => '99999999999999999999.999'],
             ['regExpValue', 'InvalidValidator', 'on' => self::SCENARIO_WSDL],
             [['dateValue'], 'date', 'on' => self::SCENARIO_WSDL],
             ['maxLengthValue', 'string', 'on' => self::SCENARIO_WSDL, 'length' => 1337],
