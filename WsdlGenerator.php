@@ -4,6 +4,7 @@
  *
  * @author Konstantinos Thermos <info@subdee.org>
  */
+/** @noinspection PhpUndefinedClassInspection */
 
 /**
  * This class is based on the WsdlGenerator class from the Yii 1 framework.
@@ -161,6 +162,10 @@ use subdee\soapserver\Validators\SimpleType;
 use yii\base\Component;
 use yii\validators\Validator;
 
+/**
+ * @description WSDL generator class
+ * @package subdee\soapserver
+ */
 class WsdlGenerator extends Component
 {
     const STYLE_RPC = 'rpc';
@@ -694,6 +699,7 @@ class WsdlGenerator extends Component
                 $complexType->setAttribute('name', $pathInfo['basename']);
                 if ($xmlType['custom_wsdl'] !== false) {
                     $custom_dom = new \DOMDocument();
+                    /** @noinspection XmlUnusedNamespaceDeclaration */
                     $custom_dom->loadXML(
                         '<root xmlns:xsd="http://www.w3.org/2001/XMLSchema">' . $xmlType['custom_wsdl'] . '</root>'
                     );
@@ -985,7 +991,7 @@ class WsdlGenerator extends Component
      * <ul>
      *
      * @param bool $return If true, generated HTML output will be returned rather than directly sent to output buffer
-     * @return string|void
+     * @return string
      */
     public function buildHtmlDocs($return = false)
     {
