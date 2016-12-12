@@ -374,7 +374,7 @@ class WsdlGenerator extends Component
             $firstHeader = null;
         }
 
-        if ($this->bindingStyle == self::STYLE_RPC) {
+        if ($this->bindingStyle === self::STYLE_RPC) {
             if (preg_match('/^@return\s+([\w\.\\\]+(\[\s*\])?)\s*?(.*)$/im', $comment, $matches)) {
                 $type = preg_replace('/\\\\+/', '\\', $matches[1]);
                 $return = array(
@@ -709,13 +709,13 @@ class WsdlGenerator extends Component
                 } else {
                     $all = $dom->createElement('xsd:' . $xmlType['indicator']);
 
-                    if (!is_null($xmlType['minOccurs'])) {
+                    if (null !== $xmlType['minOccurs']) {
                         $all->setAttribute('minOccurs', $xmlType['minOccurs']);
                     }
-                    if (!is_null($xmlType['maxOccurs'])) {
+                    if (null !== $xmlType['maxOccurs']) {
                         $all->setAttribute('maxOccurs', $xmlType['maxOccurs']);
                     }
-                    if (!is_null($xmlType['nillable'])) {
+                    if (null !== $xmlType['nillable']) {
                         $all->setAttribute('nillable', $xmlType['nillable']);
                     }
 
@@ -777,7 +777,7 @@ class WsdlGenerator extends Component
      */
     protected function injectDom(\DOMDocument $dom, \DOMElement $target, \DOMNode $source)
     {
-        if ($source->nodeType != XML_ELEMENT_NODE) {
+        if ($source->nodeType !== XML_ELEMENT_NODE) {
             return;
         }
 
@@ -888,7 +888,7 @@ class WsdlGenerator extends Component
         $operation->setAttribute('name', $name);
         $soapOperation = $dom->createElement('soap:operation');
         $soapOperation->setAttribute('soapAction', $this->namespace . '#' . $name);
-        if ($this->bindingStyle == self::STYLE_RPC) {
+        if ($this->bindingStyle === self::STYLE_RPC) {
             $soapOperation->setAttribute('style', self::STYLE_RPC);
         }
 
@@ -897,7 +897,7 @@ class WsdlGenerator extends Component
 
         $soapBody = $dom->createElement('soap:body');
         $operationBodyStyle = $this->operationBodyStyle;
-        if ($this->bindingStyle == self::STYLE_RPC && !isset($operationBodyStyle['namespace'])) {
+        if ($this->bindingStyle === self::STYLE_RPC && !isset($operationBodyStyle['namespace'])) {
             $operationBodyStyle['namespace'] = $this->namespace;
         }
         foreach ($operationBodyStyle as $attributeName => $attributeValue) {
