@@ -28,8 +28,7 @@ abstract class SimpleType
     public function getName()
     {
         $classname = substr(strtolower(get_called_class()), 0, -4);
-        if ($pos = strrpos($classname, '\\'))
-        {
+        if ($pos = strrpos($classname, '\\')) {
             return substr($classname, $pos + 1);
         }
         return $pos;

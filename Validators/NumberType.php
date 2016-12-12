@@ -7,7 +7,7 @@ namespace subdee\soapserver\Validators;
  */
 class NumberType extends SimpleType
 {
-    /** @var IntegerType|DoubleType  */
+    /** @var IntegerType|DoubleType */
     private $validator;
 
     /** @noinspection MagicMethodsValidityInspection */
@@ -19,10 +19,9 @@ class NumberType extends SimpleType
      */
     public function __construct(array $data)
     {
-        if(array_key_exists('integerOnly', $data) && $data['integerOnly'] === true){
+        if (array_key_exists('integerOnly', $data) && $data['integerOnly'] === true) {
             $this->validator = new IntegerType($data);
-        }
-        else {
+        } else {
             $this->validator = new DoubleType($data);
         }
     }

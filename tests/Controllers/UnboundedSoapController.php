@@ -6,7 +6,7 @@ namespace subdee\soapserver\tests\Controllers;
  */
 class UnboundedSoapController
 {
-    /** @var bool  */
+    /** @var bool */
     public $enableCsrfValidation = false;
 
     /**

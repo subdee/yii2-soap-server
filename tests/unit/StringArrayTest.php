@@ -26,6 +26,6 @@ class StringArrayTest extends Test
         /** @var \SimpleXMLElement[] $patternValue */
         $patternValue = $xml->xpath('///xsd:complexContent/xsd:restriction/xsd:attribute');
 
-        $this->assertEquals('soap-enc:arrayType',$patternValue[0]->attributes()->ref);
+        $this->assertEquals('soap-enc:arrayType', $patternValue[0]->attributes()->ref);
     }
 }

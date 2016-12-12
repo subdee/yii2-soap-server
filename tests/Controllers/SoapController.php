@@ -7,29 +7,29 @@ namespace subdee\soapserver\tests\Controllers;
 class SoapController
 {
     /** @var bool */
-	public $enableCsrfValidation = false;
+    public $enableCsrfValidation = false;
 
     /**
      * @return array
      */
-	public function actions()
-	{
-		return [
-			'hello' => [
-				'class' => 'subdee\soapserver\SoapAction'
-			],
-		];
-	}
+    public function actions()
+    {
+        return [
+            'hello' => [
+                'class' => 'subdee\soapserver\SoapAction'
+            ],
+        ];
+    }
 
-	/**
-	 * Returns hello and the name that you gave
-	 *
-	 * @param string $name Your name
-	 * @return string
-	 * @soap
-	 */
-	public function getHello($name)
-	{
-		return 'Hello ' . $name;
-	}
+    /**
+     * Returns hello and the name that you gave
+     *
+     * @param string $name Your name
+     * @return string
+     * @soap
+     */
+    public function getHello($name)
+    {
+        return 'Hello ' . $name;
+    }
 }

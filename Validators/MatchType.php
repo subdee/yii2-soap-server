@@ -14,12 +14,10 @@ class MatchType extends SimpleType
      */
     public function generateSimpleType()
     {
-        if(array_key_exists('pattern',$this->data['parameters']))
-        {
-            if(preg_match('/^\/(.*)\/.*/',$this->data['parameters']['pattern'], $matches)) {
+        if (array_key_exists('pattern', $this->data['parameters'])) {
+            if (preg_match('/^\/(.*)\/.*/', $this->data['parameters']['pattern'], $matches)) {
                 $simpleType['restriction']['pattern'] = $matches[1];
-            }
-            else {
+            } else {
                 throw new \ErrorException('Not a correct pattern used in this type');
             }
         }
@@ -48,7 +46,7 @@ class MatchType extends SimpleType
         if (array_key_exists('restriction', $simpleType)) {
 
             $pattern = $dom->createElement('xsd:token');
-            $pattern->setAttribute('value',$simpleType['restriction']['pattern']);
+            $pattern->setAttribute('value', $simpleType['restriction']['pattern']);
 
             $restriction->appendChild($pattern);
         }

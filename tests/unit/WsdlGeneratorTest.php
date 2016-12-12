@@ -10,23 +10,23 @@ use subdee\soapserver\WsdlGenerator;
  */
 class WsdlGeneratorTest extends Test
 {
-	public function testGenerateWsdl()
-	{
-		$wsdlGenerator = new WsdlGenerator();
-		$controller = new SoapController();
-		$wsdl = $wsdlGenerator->generateWsdl(get_class($controller), 'http://test-url/');
+    public function testGenerateWsdl()
+    {
+        $wsdlGenerator = new WsdlGenerator();
+        $controller = new SoapController();
+        $wsdl = $wsdlGenerator->generateWsdl(get_class($controller), 'http://test-url/');
 
-		$xml = simplexml_load_string($wsdl);
+        $xml = simplexml_load_string($wsdl);
         $this->assertTrue($xml instanceOf \SimpleXMLElement);
-		$this->assertSame((string) $xml->getName(), 'definitions');
+        $this->assertSame((string)$xml->getName(), 'definitions');
 
-		$operation = $xml->xpath('//wsdl:operation[@name="getHello"]');
+        $operation = $xml->xpath('//wsdl:operation[@name="getHello"]');
         $this->assertTrue($xml instanceOf \SimpleXMLElement);
 
-		$address = $xml->xpath('//soap:address');
-		$location = (string) $address[0]->attributes()->location;
-		$this->assertEquals('http://test-url/', $location);
+        $address = $xml->xpath('//soap:address');
+        $location = (string)$address[0]->attributes()->location;
+        $this->assertEquals('http://test-url/', $location);
 
-	}
+    }
 
 }

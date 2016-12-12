@@ -13,20 +13,20 @@ class SoapServiceTest extends Test
 {
     public function testGenerateWsdl()
     {
-		$controller = new SoapController();
-		$soapService = new SoapService($controller, 'http://wsdl-url/', 'http://test-url/');
-		$wsdl = $soapService->generateWsdl();
+        $controller = new SoapController();
+        $soapService = new SoapService($controller, 'http://wsdl-url/', 'http://test-url/');
+        $wsdl = $soapService->generateWsdl();
 
-		$xml = simplexml_load_string($wsdl);
+        $xml = simplexml_load_string($wsdl);
         $this->assertTrue($xml instanceOf \SimpleXMLElement);
-		$this->assertSame((string) $xml->getName(), 'definitions');
+        $this->assertSame((string)$xml->getName(), 'definitions');
 
-		$operation = $xml->xpath('//wsdl:operation[@name="getHello"]');
+        $operation = $xml->xpath('//wsdl:operation[@name="getHello"]');
         $this->assertTrue($xml instanceOf \SimpleXMLElement);
 
-		$address = $xml->xpath('//soap:address');
-		$location = (string) $address[0]->attributes()->location;
-		$this->assertEquals('http://test-url/', $location);
+        $address = $xml->xpath('//soap:address');
+        $location = (string)$address[0]->attributes()->location;
+        $this->assertEquals('http://test-url/', $location);
     }
 
     /**
@@ -36,7 +36,7 @@ class SoapServiceTest extends Test
     {
         $controller = new SoapController();
 
-        $soapService = new SoapService($controller, 'http://wsdl-url','http://test-url');
+        $soapService = new SoapService($controller, 'http://wsdl-url', 'http://test-url');
         $soapService->features = [SOAP_SINGLE_ELEMENT_ARRAYS];
 
         $reflection = new \ReflectionClass($soapService);
@@ -45,7 +45,7 @@ class SoapServiceTest extends Test
         $method->setAccessible(true);
         $result = $method->invoke($soapService);
 
-        $this->assertEquals(1,$result['features'][0]);
+        $this->assertEquals(1, $result['features'][0]);
     }
 
 }
