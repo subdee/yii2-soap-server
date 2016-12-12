@@ -64,5 +64,9 @@ class RulesTest extends Test
 
         $largeNumbersBehindDecimalValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelLargeNumberValue"]/xsd:restriction/xsd:maxInclusive');
         $this->assertEquals('99999999999999999999.999', $largeNumbersBehindDecimalValue[0]['value']);
+
+        $largeNumbersNoBehindDecimalValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelLargeNumberNoDecimalValue"]/xsd:restriction/xsd:maxInclusive');
+
+        $this->assertEquals('999', $largeNumbersNoBehindDecimalValue[0]['value']);
     }
 }

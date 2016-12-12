@@ -78,6 +78,12 @@ class RulesTestModel extends Model
     public $largeNumberValue;
 
     /**
+     * @var double
+     * @soap
+     */
+    public $largeNumberNoDecimalValue;
+
+    /**
      * List of rules for this class
      * @return array
      */
@@ -92,6 +98,7 @@ class RulesTestModel extends Model
             ['regExpValue', 'match', 'on' => self::SCENARIO_WSDL, 'pattern' => '/[a-z]*/i'],
             ['regExpValue', 'InvalidValidator', 'on' => self::SCENARIO_WSDL],
             ['numberValue', 'number', 'on' => self::SCENARIO_WSDL, 'integerOnly' => false, 'min' => 1.11, 'max' => 999],
+            ['largeNumberNoDecimalValue', 'number', 'on' => self::SCENARIO_WSDL, 'integerOnly' => false, 'min' => 1, 'max' => 999],
             ['largeNumberValue', 'number', 'on' => self::SCENARIO_WSDL, 'integerOnly' => false, 'min' => 1.11, 'max' => '99999999999999999999.999'],
             ['regExpValue', 'InvalidValidator', 'on' => self::SCENARIO_WSDL],
             [['dateValue'], 'date', 'on' => self::SCENARIO_WSDL],

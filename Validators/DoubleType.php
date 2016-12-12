@@ -21,12 +21,14 @@ class DoubleType extends SimpleType
         if (array_key_exists('min', $this->data['parameters'])) {
             $minInclusive = $this->data['parameters']['min'];
             $simpleType['restriction']['minInclusive'] = $minInclusive;
-            $simpleType['restriction']['fractionDigits'] = $this->numberOfDecimals($minInclusive);
+            $fractionDigits = max($fractionDigits, $this->numberOfDecimals($minInclusive));
+            $simpleType['restriction']['fractionDigits'] = $fractionDigits;
         }
         if (array_key_exists('max', $this->data['parameters'])) {
             $maxInclusive = $this->data['parameters']['max'];
             $simpleType['restriction']['maxInclusive'] = $maxInclusive;
-            $simpleType['restriction']['fractionDigits'] = max($fractionDigits, $this->numberOfDecimals($maxInclusive));
+            $fractionDigits = max($fractionDigits, $this->numberOfDecimals($maxInclusive));
+            $simpleType['restriction']['fractionDigits'] = $fractionDigits;
         }
 
         $simpleType['restriction']['name'] = $this->getName();
@@ -89,6 +91,9 @@ class DoubleType extends SimpleType
             return false;
         }
 
+        if (strrpos($value, '.') === false) {
+            return 0;
+        }
         return strlen($value) - strrpos($value, '.') - 1;
     }
 }
