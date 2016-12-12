@@ -21,17 +21,17 @@ class RulesTest extends Test
 
         $validators = $wsdlGenerator->parseYiiValidators('subdee\soapserver\tests\models\RulesTestModel');
 
-        $this->assertArrayHasKey('integerValue',$validators);
+        $this->assertArrayHasKey('integerValue', $validators);
         $this->assertArrayHasKey('stringValue', $validators);
 
-        $this->assertArrayHasKey('validator',$validators['integerValue'][0]);
+        $this->assertArrayHasKey('validator', $validators['integerValue'][0]);
 
-        $this->assertArrayNotHasKey('on',$validators['regExpValue'][0]['parameters']);
-        $this->assertEquals('trim',$validators['regExpValue'][0]['validator']);
+        $this->assertArrayNotHasKey('on', $validators['regExpValue'][0]['parameters']);
+        $this->assertEquals('trim', $validators['regExpValue'][0]['validator']);
 
-        $this->assertEquals('/[a-z]*/i',$validators['regExpValue'][1]['parameters']['pattern']);
+        $this->assertEquals('/[a-z]*/i', $validators['regExpValue'][1]['parameters']['pattern']);
 
-        $this->assertNotContains('InvalidValidator',$validators['regExpValue']);
+        $this->assertNotContains('InvalidValidator', $validators['regExpValue']);
     }
 
     /**
@@ -45,7 +45,7 @@ class RulesTest extends Test
 
         $xml = simplexml_load_string($wsdl);
         $this->assertTrue($xml instanceOf \SimpleXMLElement);
-        $this->assertSame((string) $xml->getName(), 'definitions');
+        $this->assertSame((string)$xml->getName(), 'definitions');
 
         $rulesValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelIntegerValue"]');
         $this->assertTrue($rulesValue[0] instanceof \SimpleXMLElement);
@@ -54,7 +54,7 @@ class RulesTest extends Test
         $this->assertEquals('.{13,37}', $patternValue[0]['value']);
 
         $tokenValue = $xml->xpath('//xsd:simpleType/xsd:restriction/xsd:token');
-        $this->assertEquals('[a-z]*',$tokenValue[0]['value']);
+        $this->assertEquals('[a-z]*', $tokenValue[0]['value']);
 
         $fractionDigitValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelNumberValue"]/xsd:restriction/xsd:fractionDigits');
         $this->assertEquals('2', $fractionDigitValue[0]['value']);

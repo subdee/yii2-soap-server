@@ -15,9 +15,8 @@ class TokenType extends SimpleType
         // FIXME we don't support not, strict and allowArray
 
         $this->data['restriction']['name'] = 'token';
-        if(array_key_exists('range',$this->data['parameters'])){
-            foreach($this->data['parameters']['range'] as $enumeration)
-            {
+        if (array_key_exists('range', $this->data['parameters'])) {
+            foreach ($this->data['parameters']['range'] as $enumeration) {
                 $simpleType['restriction']['enumeration'][] = $enumeration;
             }
         }

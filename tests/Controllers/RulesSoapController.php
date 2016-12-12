@@ -6,7 +6,7 @@ namespace subdee\soapserver\tests\Controllers;
  */
 class RulesSoapController
 {
-    /** @var bool  */
+    /** @var bool */
     public $enableCsrfValidation = false;
 
     /**

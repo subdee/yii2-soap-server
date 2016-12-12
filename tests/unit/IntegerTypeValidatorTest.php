@@ -40,7 +40,7 @@ class IntegerTypeValidatorTest extends Test
 
     public function testGeneratedName()
     {
-        $this->assertEquals('integer',$this->validator->getName());
+        $this->assertEquals('integer', $this->validator->getName());
     }
 
 
@@ -54,13 +54,13 @@ class IntegerTypeValidatorTest extends Test
         ];
         $this->validator = new IntegerType($data);
         $simpleTypeData = $this->validator->generateSimpleType();
-        $this->assertEquals('99999999999999999999',$simpleTypeData['restriction']['maxInclusive']);
+        $this->assertEquals('99999999999999999999', $simpleTypeData['restriction']['maxInclusive']);
     }
 
     public function testGeneratedSimpleTypeData()
     {
         $simpleTypeData = $this->validator->generateSimpleType();
-        $this->assertInstanceOf('subdee\soapserver\Validators\IntegerType',$this->validator);
+        $this->assertInstanceOf('subdee\soapserver\Validators\IntegerType', $this->validator);
         $this->assertArrayHasKey('restriction', $simpleTypeData);
         $this->assertArrayHasKey('minInclusive', $simpleTypeData['restriction']);
     }

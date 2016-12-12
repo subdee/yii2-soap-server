@@ -20,8 +20,7 @@ class EmailType extends MatchType
 
         $emailPattern = $emailValidator->pattern;
 
-        if(array_key_exists('allowName',$this->data['parameters']) && $this->data['parameters']['allowName']===true)
-        {
+        if (array_key_exists('allowName', $this->data['parameters']) && $this->data['parameters']['allowName'] === true) {
             $emailPattern = $emailValidator->fullPattern;
         }
         // We need to change the regexp which is used by Yii to the format used in the wsdl
