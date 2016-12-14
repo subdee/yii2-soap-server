@@ -7,6 +7,18 @@ namespace subdee\soapserver\Validators;
  */
 class DoubleType extends SimpleType
 {
+    private $fractionDigits;
+
+    /**
+     * DoubleType constructor.
+     * @param array $data
+     * @param int $fractionDigits
+     */
+    public function __construct(array $data, $fractionDigits = 0)
+    {
+        parent::__construct($data);
+        $this->fractionDigits = $fractionDigits;
+    }
 
     /**
      * Generates a Integer wsdl array
@@ -16,19 +28,15 @@ class DoubleType extends SimpleType
     {
         $simpleType = [];
 
-        $fractionDigits = 0;
-
         if (array_key_exists('min', $this->data['parameters'])) {
             $minInclusive = $this->data['parameters']['min'];
             $simpleType['restriction']['minInclusive'] = $minInclusive;
-            $fractionDigits = max($fractionDigits, $this->numberOfDecimals($minInclusive));
-            $simpleType['restriction']['fractionDigits'] = $fractionDigits;
+            $simpleType['restriction']['fractionDigits'] = $this->fractionDigits;
         }
         if (array_key_exists('max', $this->data['parameters'])) {
             $maxInclusive = $this->data['parameters']['max'];
             $simpleType['restriction']['maxInclusive'] = $maxInclusive;
-            $fractionDigits = max($fractionDigits, $this->numberOfDecimals($maxInclusive));
-            $simpleType['restriction']['fractionDigits'] = $fractionDigits;
+            $simpleType['restriction']['fractionDigits'] = $this->fractionDigits;
         }
 
         $simpleType['restriction']['name'] = $this->getName();
@@ -73,27 +81,5 @@ class DoubleType extends SimpleType
         $simpleTypeElement->appendChild($restriction);
 
         return $simpleTypeElement;
-    }
-
-    /**
-     * Returns the number of decimals of a number
-     * @param $value
-     * @return bool|int
-     */
-    private function numberOfDecimals($value)
-    {
-        if (!is_string($value)) {
-            $value = (string)$value;
-        }
-        if ((int)$value === $value) {
-            return 0;
-        } else if (!is_numeric($value)) {
-            return false;
-        }
-
-        if (strrpos($value, '.') === false) {
-            return 0;
-        }
-        return strlen($value) - strrpos($value, '.') - 1;
     }
 }

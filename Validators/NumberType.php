@@ -19,10 +19,18 @@ class NumberType extends SimpleType
      */
     public function __construct(array $data)
     {
-        if (array_key_exists('integerOnly', $data) && $data['integerOnly'] === true) {
+        $fractionDigits = 0;
+        if (array_key_exists('min', $data['parameters'])) {
+            $fractionDigits = max($fractionDigits, $this->numberOfDecimals($data['parameters']['min']));
+        }
+        if (array_key_exists('max', $data['parameters'])) {
+            $fractionDigits = max($fractionDigits, $this->numberOfDecimals($data['parameters']['max']));
+        }
+
+        if ($fractionDigits === 0 || (array_key_exists('integerOnly', $data) && $data['integerOnly'] === true)) {
             $this->validator = new IntegerType($data);
         } else {
-            $this->validator = new DoubleType($data);
+            $this->validator = new DoubleType($data, $fractionDigits);
         }
     }
 
@@ -50,5 +58,27 @@ class NumberType extends SimpleType
     public function getName()
     {
         return $this->validator->getName();
+    }
+
+    /**
+     * Returns the number of decimals of a number
+     * @param $value
+     * @return bool|int
+     */
+    private function numberOfDecimals($value)
+    {
+        if (!is_string($value)) {
+            $value = (string)$value;
+        }
+        if ((int)$value === $value) {
+            return 0;
+        } else if (!is_numeric($value)) {
+            return false;
+        }
+
+        if (strrpos($value, '.') === false) {
+            return 0;
+        }
+        return strlen($value) - strrpos($value, '.') - 1;
     }
 }
