@@ -171,9 +171,10 @@ class SoapService extends Component
             try {
                 $server->handle();
             }
-            catch(Exception $e)
+            catch (Exception $e)
             {
-                var_dump($e);die();
+                var_dump($e);
+                die();
             }
             $soapXml = ob_get_contents();
             ob_end_clean();

@@ -421,16 +421,16 @@ class WsdlGenerator extends Component
 
         $class = new \ReflectionClass($originalClass);
         $rulesPerField = [];
-        if($class->isSubclassOf('yii\base\Model'))
+        if ($class->isSubclassOf('yii\base\Model'))
         {
             $rulesMethod = $class->getMethod('rules');
             $rules = $rulesMethod->invoke(new $originalClass);
 
-            foreach($rules as $rule) {
+            foreach ($rules as $rule) {
                 // If we find 'wsdl' in the scenario's and if we know the validator (cause it's build-in), we parse the
                 // validator. We don't support external validators
                 if(array_key_exists('on', $rule) && $rule['on'] === 'wsdl'
-                    && (array_key_exists($rule[1],Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true))) {
+                    && (array_key_exists($rule[1], Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true))) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
                     }
@@ -465,8 +465,8 @@ class WsdlGenerator extends Component
     protected function processType($type, \ReflectionProperty $variable = null)
     {
         // SimpleTypes
-        if(null !== $variable) {
-            foreach($this->simpleTypes as $simpleType) {
+        if (null !== $variable) {
+            foreach ($this->simpleTypes as $simpleType) {
                 if ($simpleType['name'] === strtolower($variable->getDeclaringClass()->getShortName()) . ucfirst($variable->getName())) {
                     return 'tns:' . $simpleType['name'];
                 }
@@ -479,16 +479,16 @@ class WsdlGenerator extends Component
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
             return is_array($this->types[$type]) ? 'tns:' . $pathInfo['basename'] : $this->types[$type];
-        } elseif (isset(self::$typeMap[substr($type,0,-2)]) && ($pos = strpos($type, '[]'))  ) { // array of build-in types
+        } elseif (isset(self::$typeMap[substr($type, 0, -2)]) && ($pos = strpos ($type, '[]'))  ) { // array of build-in types
             $type = substr($type, 0, $pos);
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
             $this->types[$type . '[]'] = 'tns:' . $pathInfo['basename'] . 'Array';
             $this->processType($type);
             return $this->types[$type . '[]'];
-        } else { // process class / complex type / arrays
-
-            if($pos = strpos($type,'[]')) {
+        } else {
+            // process class / complex type / arrays
+            if ($pos = strpos($type, '[]')) {
                 $type = substr($type, 0, $pos);
             }
             $class = new \ReflectionClass($type);
@@ -544,7 +544,7 @@ class WsdlGenerator extends Component
                         }
 
                         // We try to created simpleTypes if we have validators defined in the YiiModels
-                        if(array_key_exists($property->getName(),$this->validators[$property->class])) {
+                        if (array_key_exists($property->getName(), $this->validators[$property->class])) {
                             foreach ($this->validators[$property->class][$property->getName()] as $validator) {
                                 $simpleType = [];
                                 if (in_array($validator['validator'], self::$validatorTypeList, true)) {
@@ -554,7 +554,7 @@ class WsdlGenerator extends Component
                                     $simpleType['class'] = $validator;
                                 }
 
-                                if($simpleType) {
+                                if ($simpleType) {
                                     $simpleType['name'] = strtolower(str_replace('\\', '', $property->getDeclaringClass()->getShortName())) . ucfirst($property->getName());
                                     $this->simpleTypes[] = $simpleType;
                                 }
@@ -760,7 +760,7 @@ class WsdlGenerator extends Component
 
             $schema->appendChild($element);
         }
-        foreach($this->addSimpleTypes($dom) as $simpleType)
+        foreach ($this->addSimpleTypes($dom) as $simpleType)
         {
             $schema->appendChild($simpleType);
         }
@@ -963,10 +963,9 @@ class WsdlGenerator extends Component
         $simpleTypes = [];
         if (is_array($this->simpleTypes)) {
             foreach ($this->simpleTypes as $simpleType) {
-
                 /** @var Validators\SimpleType $validator */
                 $validator = $simpleType['class'];
-                if(is_object($validator->generateXsd($dom,$simpleType['name']))) {
+                if (is_object($validator->generateXsd($dom, $simpleType['name']))) {
                     $simpleTypes[] = $validator->generateXsd($dom, $simpleType['name']);
                 }
             }

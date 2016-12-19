@@ -43,7 +43,8 @@ class MatchType extends SimpleType
 
         $simpleType = $this->generateSimpleType();
 
-        if (array_key_exists('restriction', $simpleType)) {
+        if (array_key_exists('restriction', $simpleType))
+        {
 
             $pattern = $dom->createElement('xsd:token');
             $pattern->setAttribute('value', $simpleType['restriction']['pattern']);

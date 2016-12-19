@@ -44,7 +44,7 @@ class RulesTest extends Test
         $wsdl = $soapService->generateWsdl();
 
         $xml = simplexml_load_string($wsdl);
-        $this->assertTrue($xml instanceOf \SimpleXMLElement);
+        $this->assertTrue($xml instanceof \SimpleXMLElement);
         $this->assertSame((string)$xml->getName(), 'definitions');
 
         $rulesValue = $xml->xpath('//xsd:simpleType[@name="rulestestmodelIntegerValue"]');

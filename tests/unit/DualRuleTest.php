@@ -21,7 +21,7 @@ class DualRuleTest extends Test
         $wsdl = $soapService->generateWsdl();
 
         $xml = simplexml_load_string($wsdl);
-        $this->assertTrue($xml instanceOf \SimpleXMLElement);
+        $this->assertTrue($xml instanceof \SimpleXMLElement);
         $this->assertSame((string)$xml->getName(), 'definitions');
 
         $patternValue = $xml->xpath('//xsd:simpleType/xsd:restriction/xsd:pattern/@value');
