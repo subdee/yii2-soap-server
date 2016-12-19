@@ -170,8 +170,7 @@ class SoapService extends Component
             ob_start();
             try {
                 $server->handle();
-            } catch (Exception $e)
-            {
+            } catch (Exception $e) {
                 var_dump($e);
                 die();
             }
@@ -215,7 +214,7 @@ class SoapService extends Component
         $options['encoding'] = $this->encoding;
 
         foreach ($this->classMap as $type => $className) {
-            $options['classmap'][$type]=$className;
+            $options['classmap'][$type] = $className;
         }
 
         $options['features'] = $this->features;

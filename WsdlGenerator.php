@@ -401,11 +401,11 @@ class WsdlGenerator extends Component
         $this->operations[$methodName] = array(
             'doc' => $doc,
             'headers' => $firstHeader === null ? null : array(
-                    'input' => array(
-                        $methodName . 'Headers',
-                        $firstHeaderKey
-                    )
-                ),
+                'input' => array(
+                    $methodName . 'Headers',
+                    $firstHeaderKey
+                )
+            ),
         );
     }
 
@@ -428,8 +428,8 @@ class WsdlGenerator extends Component
             foreach ($rules as $rule) {
                 // If we find 'wsdl' in the scenario's and if we know the validator (cause it's build-in), we parse the
                 // validator. We don't support external validators
-                if(array_key_exists('on', $rule) && $rule['on'] === 'wsdl'
-                    && (array_key_exists($rule[1], Validator::$builtInValidators) || in_array($rule[1],Validator::$builtInValidators,true))) {
+                if (array_key_exists('on', $rule) && $rule['on'] === 'wsdl'
+                    && (array_key_exists($rule[1], Validator::$builtInValidators) || in_array($rule[1], Validator::$builtInValidators, true))) {
                     if (!is_array($rule[0])) {
                         $rule[0] = [$rule[0]];
                     }
@@ -478,7 +478,9 @@ class WsdlGenerator extends Component
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
             return is_array($this->types[$type]) ? 'tns:' . $pathInfo['basename'] : $this->types[$type];
-        } elseif (isset(self::$typeMap[substr($type, 0, -2)]) && ($pos = strpos($type, '[]'))) { // array of build-in types
+        } elseif (isset(self::$typeMap[substr($type, 0, -2)]) && ($pos = strpos($type,
+                '[]'))
+        ) { // array of build-in types
             $type = substr($type, 0, $pos);
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
@@ -554,7 +556,8 @@ class WsdlGenerator extends Component
                                 }
 
                                 if ($simpleType) {
-                                    $simpleType['name'] = strtolower(str_replace('\\', '', $property->getDeclaringClass()->getShortName())) . ucfirst($property->getName());
+                                    $simpleType['name'] = strtolower(str_replace('\\', '',
+                                            $property->getDeclaringClass()->getShortName())) . ucfirst($property->getName());
                                     $this->simpleTypes[] = $simpleType;
                                 }
                             }
