@@ -14,8 +14,7 @@ require_once __DIR__ . '/../vendor/yiisoft/yii2/Yii.php';
 function autoload_class_dir($class_name)
 {
     $fileName = 'Classes/' . $class_name . '.php';
-    if (file_exists($fileName))
-    {
+    if (file_exists($fileName)) {
         /** @noinspection PhpIncludeInspection */
         require_once $fileName;
     }

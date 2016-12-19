@@ -421,8 +421,7 @@ class WsdlGenerator extends Component
 
         $class = new \ReflectionClass($originalClass);
         $rulesPerField = [];
-        if ($class->isSubclassOf('yii\base\Model'))
-        {
+        if ($class->isSubclassOf('yii\base\Model')) {
             $rulesMethod = $class->getMethod('rules');
             $rules = $rulesMethod->invoke(new $originalClass);
 
@@ -479,7 +478,7 @@ class WsdlGenerator extends Component
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
             return is_array($this->types[$type]) ? 'tns:' . $pathInfo['basename'] : $this->types[$type];
-        } elseif (isset(self::$typeMap[substr($type, 0, -2)]) && ($pos = strpos ($type, '[]'))  ) { // array of build-in types
+        } elseif (isset(self::$typeMap[substr($type, 0, -2)]) && ($pos = strpos($type, '[]'))) { // array of build-in types
             $type = substr($type, 0, $pos);
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
@@ -760,8 +759,7 @@ class WsdlGenerator extends Component
 
             $schema->appendChild($element);
         }
-        foreach ($this->addSimpleTypes($dom) as $simpleType)
-        {
+        foreach ($this->addSimpleTypes($dom) as $simpleType) {
             $schema->appendChild($simpleType);
         }
         $types->appendChild($schema);

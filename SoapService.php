@@ -170,8 +170,7 @@ class SoapService extends Component
             ob_start();
             try {
                 $server->handle();
-            }
-            catch (Exception $e)
+            } catch (Exception $e)
             {
                 var_dump($e);
                 die();
