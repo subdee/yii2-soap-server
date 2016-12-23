@@ -4,6 +4,7 @@
  *
  * @author Konstantinos Thermos <info@subdee.org>
  */
+/** @noinspection PhpUndefinedClassInspection */
 
 /**
  * This class is based on the WsdlGenerator class from the Yii 1 framework.
@@ -50,8 +51,8 @@
  * <pre>
  * / **
  *   * A foo method.
- *   * @param string name of something
- *   * @param string value of something
+ *   * @param string $name name of something
+ *   * @param string $value value of something
  *   * @return string[] some array
  *   * @soap
  *   * /
@@ -67,7 +68,7 @@
  *       * /
  *     public $name;
  *     / **
- *       * @var Member[] members of foo
+ *       * @var Member[] $members members of foo
  *       * @soap
  *       * /
  *     public $members;
@@ -107,7 +108,7 @@
  *     ...
  * }
  * </pre>
- * For more on soap indicators, see See {@link http://www.w3schools.com/schema/schema_complex_indicators.asp}.
+ * For more on soap indicators, see See {@link http://www.w3schools.com/xml/schema_complex_indicators.asp}.
  *
  * Since the variability of WSDL definitions is virtually unlimited, a special doc comment tag '@soap-wsdl' can be used in order to inject any custom XML string into generated WSDL file.
  * If such a block of the code is found in class's comment block, then it will be used instead of parsing and generating standard attributes within the class.
@@ -145,6 +146,8 @@
  * </pre>
  * In the example above, WSDL generator would inject under XML node <xsd:User> the code block defined by @soap-wsdl lines.
  *
+ * @header can be used to insert SOAP headers into the request, see https://github.com/yiisoft/yii/pull/2141 for more information
+ *
  * By inserting into SOAP URL link the parameter "?makedoc", WSDL generator will output human-friendly overview of all complex data types rather than XML WSDL file.
  * Each complex type is described in a separate HTML table and recognizes also the '@example' PHPDoc tag. See {@link buildHtmlDocs()}.
  *
@@ -155,8 +158,14 @@
 
 namespace subdee\soapserver;
 
+use subdee\soapserver\Validators\SimpleType;
 use yii\base\Component;
+use yii\validators\Validator;
 
+/**
+ * @description WSDL generator class
+ * @package subdee\soapserver
+ */
 class WsdlGenerator extends Component
 {
     const STYLE_RPC = 'rpc';
@@ -175,7 +184,6 @@ class WsdlGenerator extends Component
         'date' => 'xsd:date',
         'time' => 'xsd:time',
         'datetime' => 'xsd:dateTime',
-        'array' => 'soap-enc:Array',
         'object' => 'xsd:struct',
         'mixed' => 'xsd:anyType',
     );
@@ -229,6 +237,31 @@ class WsdlGenerator extends Component
      * @var array Map of request and response types for all operations.
      */
     protected $messages;
+
+    /**
+     * @var array List of validators we know
+     */
+    protected $validators = [];
+
+    /**
+     * @var array List of simple types (aka which fields have validators )
+     */
+    protected $simpleTypes = [];
+
+    /**
+     * @var array List of validatorTypes which are inserted into WSDL by using simpletypes
+     */
+    protected static $validatorTypeList = [
+        'email',
+        'in',
+        'integer',
+        'length',
+        'match',
+        'number',
+        'string',
+        'token',
+        'trim',
+    ];
 
     /**
      * Generates the WSDL for the given class.
@@ -295,7 +328,7 @@ class WsdlGenerator extends Component
             $n = count($params);
         }
 
-        if ($this->bindingStyle == self::STYLE_RPC) {
+        if ($this->bindingStyle === self::STYLE_RPC) {
             for ($i = 0; $i < $n; ++$i) {
                 $type = preg_replace('/\\\\+/', '\\', $matches[1][$i]);
                 $message[$params[$i]->getName()] = array(
@@ -323,7 +356,7 @@ class WsdlGenerator extends Component
             $type = preg_replace('/\\\\+/', '\\', $matches[1][$i]);
             $type = $this->processType($type);
             $doc = trim($matches[3][$i]);
-            if ($this->bindingStyle == self::STYLE_RPC) {
+            if ($this->bindingStyle === self::STYLE_RPC) {
                 $headers[$name] = array($type, $doc);
             } else {
                 $this->elements[$name][$name] = array('type' => $type);
@@ -340,7 +373,7 @@ class WsdlGenerator extends Component
             $firstHeader = null;
         }
 
-        if ($this->bindingStyle == self::STYLE_RPC) {
+        if ($this->bindingStyle === self::STYLE_RPC) {
             if (preg_match('/^@return\s+([\w\.\\\]+(\[\s*\])?)\s*?(.*)$/im', $comment, $matches)) {
                 $type = preg_replace('/\\\\+/', '\\', $matches[1]);
                 $return = array(
@@ -361,43 +394,107 @@ class WsdlGenerator extends Component
             $this->messages[$methodName . 'Out'] = array('parameters' => array('element' => 'tns:' . $methodName . 'Response'));
         }
 
-        if (preg_match('/^\/\*+\s*([^@]*?)\n@/s', $comment, $matches)) {
+        $doc = '';
+        if (preg_match('/^\/\*+\s*([^@]*?)\n@/', $comment, $matches)) {
             $doc = trim($matches[1]);
-        } else {
-            $doc = '';
         }
         $this->operations[$methodName] = array(
             'doc' => $doc,
             'headers' => $firstHeader === null ? null : array(
-                    'input' => array(
-                        $methodName . 'Headers',
-                        $firstHeaderKey
-                    )
-                ),
+                'input' => array(
+                    $methodName . 'Headers',
+                    $firstHeaderKey
+                )
+            ),
         );
     }
 
     /**
+     * Here we parse the validators which are defined in Yii2 Model classes
+     * @param string $originalClass
+     * @return array
+     */
+    public function parseYiiValidators($originalClass)
+    {
+        // Maybe we have some validators on this class
+        // TODO this should run only one time per class
+
+        $class = new \ReflectionClass($originalClass);
+        $rulesPerField = [];
+        if ($class->isSubclassOf('yii\base\Model')) {
+            $rulesMethod = $class->getMethod('rules');
+            $rules = $rulesMethod->invoke(new $originalClass);
+
+            foreach ($rules as $rule) {
+                // If we find 'wsdl' in the scenario's and if we know the validator (cause it's build-in), we parse the
+                // validator. We don't support external validators
+                if (array_key_exists('on', $rule) && $rule['on'] === 'wsdl'
+                    && (array_key_exists($rule[1], Validator::$builtInValidators) || in_array($rule[1], Validator::$builtInValidators, true))) {
+                    if (!is_array($rule[0])) {
+                        $rule[0] = [$rule[0]];
+                    }
+
+                    /** @var string[] $fields */
+                    $fields = array_shift($rule);
+                    $validator = array_shift($rule);
+                    array_shift($rule); // we don't need the 'on' parameter which is always the third parameter in this array
+                    $keys = array_keys($rule);
+
+                    $parameters = [];
+                    foreach ($keys as $key) {
+                        $parameters[$key] = $rule[$key];
+                    }
+
+                    foreach ($fields as $field) {
+                        $rulesPerField[$field][] = ['validator' => $validator, 'parameters' => $parameters];
+                    }
+                }
+            }
+        }
+        return $rulesPerField;
+
+    }
+
+    /**
+     * We process all the types we've found here
      * @param $type
+     * @param \ReflectionProperty $variable Indicated which variable we are working for
      * @return string
      */
-    protected function processType($type)
+    protected function processType($type, \ReflectionProperty $variable = null)
     {
+        // SimpleTypes
+        if (null !== $variable) {
+            foreach ($this->simpleTypes as $simpleType) {
+                if ($simpleType['name'] === strtolower($variable->getDeclaringClass()->getShortName()) . ucfirst($variable->getName())) {
+                    return 'tns:' . $simpleType['name'];
+                }
+            }
+        }
+        // build-in types (eg. int, string )
         if (isset(self::$typeMap[$type])) {
             return self::$typeMap[$type];
         } elseif (isset($this->types[$type])) {
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
             return is_array($this->types[$type]) ? 'tns:' . $pathInfo['basename'] : $this->types[$type];
-        } elseif (($pos = strpos($type, '[]')) !== false) { // array of types
+        } elseif (isset(self::$typeMap[substr($type, 0, -2)]) && ($pos = strpos($type, '[]'))) {
+            // array of build-in types
             $type = substr($type, 0, $pos);
             $pathInfo = pathinfo(str_replace('\\', '/', $type));
 
             $this->types[$type . '[]'] = 'tns:' . $pathInfo['basename'] . 'Array';
             $this->processType($type);
             return $this->types[$type . '[]'];
-        } else { // process class / complex type
+        } else {
+            // process class / complex type / arrays
+            if ($pos = strpos($type, '[]')) {
+                $type = substr($type, 0, $pos);
+            }
             $class = new \ReflectionClass($type);
+
+            // We want to parse the validators we have in order to create restrictions
+            $this->validators[$class->name] = $this->parseYiiValidators($type);
 
             $comment = $class->getDocComment();
             $comment = strtr(
@@ -407,12 +504,12 @@ class WsdlGenerator extends Component
             $comment = preg_replace('/^\s*\**(\s*?$|\s*)/m', '', $comment);
 
             // extract soap indicator flag, if defined, e.g. @soap-indicator sequence
-            // see http://www.w3schools.com/schema/schema_complex_indicators.asp
+            // see http://www.w3schools.com/xml/schema_complex_indicators.asp
             if (preg_match('/^@soap-indicator\s+(\w+)\s*?(.*)$/im', $comment, $matches)) {
                 $indicator = $matches[1];
                 $attributes = $this->getWsdlElementAttributes($matches[2]);
             } else {
-                $indicator = 'all';
+                $indicator = 'sequence';
                 $attributes = $this->getWsdlElementAttributes('');
             }
 
@@ -442,14 +539,31 @@ class WsdlGenerator extends Component
 
                         // extract PHPDoc @example
                         $example = '';
-                        if (preg_match("/@example[:]?(.+)/mi", $comment, $match)) {
+                        if (preg_match('/@example[:]?(.+)/mi', $comment, $match)) {
                             $example = trim($match[1]);
                         }
 
-                        $varType = preg_replace('/\\\\+/', '\\', $matches[1]);
+                        // We try to created simpleTypes if we have validators defined in the YiiModels
+                        if (array_key_exists($property->getName(), $this->validators[$property->class])) {
+                            foreach ($this->validators[$property->class][$property->getName()] as $validator) {
+                                $simpleType = [];
+                                if (in_array($validator['validator'], self::$validatorTypeList, true)) {
+                                    $className = 'subdee\soapserver\Validators\\' . ucfirst($validator['validator']) . 'Type';
+                                    /** @var SimpleType $validator */
+                                    $validator = new $className($validator);
+                                    $simpleType['class'] = $validator;
+                                }
 
+                                if ($simpleType) {
+                                    $simpleType['name'] = strtolower(str_replace('\\', '', $property->getDeclaringClass()->getShortName())) . ucfirst($property->getName());
+                                    $this->simpleTypes[] = $simpleType;
+                                }
+                            }
+                        }
+
+                        $varType = preg_replace('/\\\\+/', '\\', $matches[1]);
                         $this->types[$type]['properties'][$property->getName()] = array(
-                            $this->processType($varType),
+                            $this->processType($varType, $property),
                             trim($matches[3]),
                             $attributes['nillable'],
                             $attributes['minOccurs'],
@@ -478,16 +592,16 @@ class WsdlGenerator extends Component
                 foreach ($attr[2] as $id => $prop) {
                     $prop = strtolower($prop);
                     $val = strtolower($attr[3][$id]);
-                    if ($prop == 'nillable') {
-                        if ($val == 'false' || $val == 'true') {
+                    if ($prop === 'nillable') {
+                        if ($val === 'false' || $val === 'true') {
                             $nillable = $val;
                         } else {
                             $nillable = $val ? 'true' : 'false';
                         }
-                    } elseif ($prop == 'minoccurs') {
-                        $minOccurs = intval($val);
-                    } elseif ($prop == 'maxoccurs') {
-                        $maxOccurs = ($val == 'unbounded') ? 'unbounded' : intval($val);
+                    } elseif ($prop === 'minoccurs') {
+                        $minOccurs = (int)$val;
+                    } elseif ($prop === 'maxoccurs') {
+                        $maxOccurs = ($val === 'unbounded') ? 'unbounded' : (int)$val;
                     }
                 }
             }
@@ -507,19 +621,18 @@ class WsdlGenerator extends Component
     protected function buildDOM($serviceUrl, $encoding)
     {
         $xml = "<?xml version=\"1.0\" encoding=\"$encoding\"?>
-<definitions name=\"{$this->serviceName}\" targetNamespace=\"{$this->namespace}\"
+<wsdl:definitions name=\"{$this->serviceName}\" targetNamespace=\"{$this->namespace}\"
 	 xmlns=\"http://schemas.xmlsoap.org/wsdl/\"
 	 xmlns:tns=\"{$this->namespace}\"
 	 xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\"
 	 xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"
 	 xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\"
-	 xmlns:soap-enc=\"http://schemas.xmlsoap.org/soap/encoding/\"></definitions>";
+	 xmlns:soap-enc=\"http://schemas.xmlsoap.org/soap/encoding/\"></wsdl:definitions>";
 
         $dom = new \DOMDocument();
         $dom->formatOutput = true;
-        $dom->loadXml($xml);
+        $dom->loadXML($xml);
         $this->addTypes($dom);
-
         $this->addMessages($dom);
         $this->addPortTypes($dom);
         $this->addBindings($dom);
@@ -562,7 +675,7 @@ class WsdlGenerator extends Component
                     $restriction->setAttribute('base', 'soap-enc:Array');
                     $attribute = $dom->createElement('xsd:attribute');
                     $attribute->setAttribute('ref', 'soap-enc:arrayType');
-                    $attribute->setAttribute('wsdl:arrayType', substr($xmlType, 0, strlen($xmlType) - 5) . '[]');
+                    $attribute->setAttribute('wsdl:arrayType', substr($xmlType, 0, $xmlType - 5) . '[]');
 
                     $restriction->appendChild($attribute);
                     $complexContent->appendChild($restriction);
@@ -586,6 +699,7 @@ class WsdlGenerator extends Component
                 $complexType->setAttribute('name', $pathInfo['basename']);
                 if ($xmlType['custom_wsdl'] !== false) {
                     $custom_dom = new \DOMDocument();
+                    /** @noinspection XmlUnusedNamespaceDeclaration */
                     $custom_dom->loadXML(
                         '<root xmlns:xsd="http://www.w3.org/2001/XMLSchema">' . $xmlType['custom_wsdl'] . '</root>'
                     );
@@ -595,13 +709,13 @@ class WsdlGenerator extends Component
                 } else {
                     $all = $dom->createElement('xsd:' . $xmlType['indicator']);
 
-                    if (!is_null($xmlType['minOccurs'])) {
+                    if (null !== $xmlType['minOccurs']) {
                         $all->setAttribute('minOccurs', $xmlType['minOccurs']);
                     }
-                    if (!is_null($xmlType['maxOccurs'])) {
+                    if (null !== $xmlType['maxOccurs']) {
                         $all->setAttribute('maxOccurs', $xmlType['maxOccurs']);
                     }
-                    if (!is_null($xmlType['nillable'])) {
+                    if (null !== $xmlType['nillable']) {
                         $all->setAttribute('nillable', $xmlType['nillable']);
                     }
 
@@ -643,7 +757,11 @@ class WsdlGenerator extends Component
                 $complexType->appendChild($sequence);
             }
             $element->appendChild($complexType);
+
             $schema->appendChild($element);
+        }
+        foreach ($this->addSimpleTypes($dom) as $simpleType) {
+            $schema->appendChild($simpleType);
         }
         $types->appendChild($schema);
         $dom->documentElement->appendChild($types);
@@ -658,7 +776,7 @@ class WsdlGenerator extends Component
      */
     protected function injectDom(\DOMDocument $dom, \DOMElement $target, \DOMNode $source)
     {
-        if ($source->nodeType != XML_ELEMENT_NODE) {
+        if ($source->nodeType !== XML_ELEMENT_NODE) {
             return;
         }
 
@@ -769,7 +887,7 @@ class WsdlGenerator extends Component
         $operation->setAttribute('name', $name);
         $soapOperation = $dom->createElement('soap:operation');
         $soapOperation->setAttribute('soapAction', $this->namespace . '#' . $name);
-        if ($this->bindingStyle == self::STYLE_RPC) {
+        if ($this->bindingStyle === self::STYLE_RPC) {
             $soapOperation->setAttribute('style', self::STYLE_RPC);
         }
 
@@ -778,7 +896,7 @@ class WsdlGenerator extends Component
 
         $soapBody = $dom->createElement('soap:body');
         $operationBodyStyle = $this->operationBodyStyle;
-        if ($this->bindingStyle == self::STYLE_RPC && !isset($operationBodyStyle['namespace'])) {
+        if ($this->bindingStyle === self::STYLE_RPC && !isset($operationBodyStyle['namespace'])) {
             $operationBodyStyle['namespace'] = $this->namespace;
         }
         foreach ($operationBodyStyle as $attributeName => $attributeValue) {
@@ -835,6 +953,26 @@ class WsdlGenerator extends Component
     }
 
     /**
+     * Adds the simple types as found in the validators of the models used
+     * @param \DOMDocument $dom
+     * @return \DOMElement[]
+     */
+    protected function addSimpleTypes(\DOMDocument $dom)
+    {
+        $simpleTypes = [];
+        if (is_array($this->simpleTypes)) {
+            foreach ($this->simpleTypes as $simpleType) {
+                /** @var Validators\SimpleType $validator */
+                $validator = $simpleType['class'];
+                if (is_object($validator->generateXsd($dom, $simpleType['name']))) {
+                    $simpleTypes[] = $validator->generateXsd($dom, $simpleType['name']);
+                }
+            }
+        }
+        return $simpleTypes;
+    }
+
+    /**
      * Generate human friendly HTML documentation for complex data types.
      * This method can be invoked either by inserting URL parameter "&makedoc" into URL link, e.g. "http://www.mydomain.com/soap/create?makedoc", or simply by calling from another script with argument $return=true.
      *
@@ -851,7 +989,7 @@ class WsdlGenerator extends Component
      * <ul>
      *
      * @param bool $return If true, generated HTML output will be returned rather than directly sent to output buffer
-     * @return string|void
+     * @return string
      */
     public function buildHtmlDocs($return = false)
     {
@@ -861,7 +999,7 @@ class WsdlGenerator extends Component
 table{border-collapse: collapse;background-color: #DDDDDD;}
 tr{background-color: #FFFFFF;}
 th{background-color: #EEEEEE;}
-th, td{font-size: 12px;font-family: courier;padding: 3px;}
+th, td{font-size: 12px;font-family: courier,serif;padding: 3px;}
 </style>';
         $html .= '</head><body>';
         $html .= '<h2>WSDL documentation for service ' . $this->serviceName . '</h2>';
@@ -877,6 +1015,7 @@ th, td{font-size: 12px;font-family: courier;padding: 3px;}
                 ) {
                     continue;
                 }
+                /** @var array $params */
                 $params = $options['properties'];
                 $html .= "\n\n<h3>Object: {$object}</h3>";
                 $html .= '<table border="1" cellspacing="1" cellpadding="1">';

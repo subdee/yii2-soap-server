@@ -86,6 +86,12 @@ class SoapService extends Component
     public $persistence;
 
     /**
+     * @see http://www.php.net/manual/en/soapserver.soapserver.php (features list under heading 'options')
+     * @var string[]
+     */
+    public $features;
+
+    /**
      * Set options like binding style and body style
      * @var array
      */
@@ -162,7 +168,12 @@ class SoapService extends Component
             }
             $server->setObject($provider);
             ob_start();
-            $server->handle();
+            try {
+                $server->handle();
+            } catch (Exception $e) {
+                var_dump($e);
+                die();
+            }
             $soapXml = ob_get_contents();
             ob_end_clean();
             return $soapXml;
@@ -203,8 +214,11 @@ class SoapService extends Component
         $options['encoding'] = $this->encoding;
 
         foreach ($this->classMap as $type => $className) {
-            $options['classmap'][$type]=$className;
+            $options['classmap'][$type] = $className;
         }
+
+        $options['features'] = $this->features;
+
         return $options;
     }
 
