@@ -114,7 +114,7 @@ class SoapAction extends Action
             $this->_service->$name = $value;
         }
 
-        if (isset($_GET[$this->serviceVar])) {
+        if (!isset($_GET[$this->serviceVar])) {
             return $this->_service->run();
         } else {
             $wsdl = $this->_service->generateWsdl();
