@@ -544,7 +544,7 @@ class WsdlGenerator extends Component
                         }
 
                         // We try to created simpleTypes if we have validators defined in the YiiModels
-                        if (array_key_exists($property->getName(), $this->validators[$property->class])) {
+                        if (isset($this->validators[$property->class])&&array_key_exists($property->getName(), $this->validators[$property->class])) {
                             foreach ($this->validators[$property->class][$property->getName()] as $validator) {
                                 $simpleType = [];
                                 if (in_array($validator['validator'], self::$validatorTypeList, true)) {
