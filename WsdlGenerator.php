@@ -675,7 +675,10 @@ class WsdlGenerator extends Component
                     $restriction->setAttribute('base', 'soap-enc:Array');
                     $attribute = $dom->createElement('xsd:attribute');
                     $attribute->setAttribute('ref', 'soap-enc:arrayType');
-                    $attribute->setAttribute('wsdl:arrayType', substr($xmlType, 0, $xmlType - 5) . '[]');
+                    $attribute->setAttribute(
+                        'wsdl:arrayType',
+                        substr($xmlType, 0, strlen($xmlType) - 5) . '[]'
+                    );
 
                     $restriction->appendChild($attribute);
                     $complexContent->appendChild($restriction);
